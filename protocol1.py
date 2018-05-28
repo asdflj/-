@@ -55,7 +55,7 @@ class My_ptl:
                      'title': title, 'time': ctime(), 'data': fileData}
         else:
             raise '类型错误'
-        return pData(result, self.BUFFERSIZE)
+        return PData(result, self.BUFFERSIZE)
 
     def splitUserPwd(self, data):
         '''提供基础的分割字符中的用户名和密码返回为元组
@@ -80,7 +80,7 @@ class My_ptl:
             if callback != None:  #每次接收回调函数，默认为空可用于获取速度
                 callback()
             if length <= 0:
-                return pData(bdata, self.BUFFERSIZE)
+                return PData(bdata, self.BUFFERSIZE)
 
     @staticmethod
     def __get_recv_length(data):
@@ -110,7 +110,8 @@ class My_ptl:
         self.__sockfd.close()
 
 
-class pData:
+class PData:
+    '''使其方便使用接收到的数据 不需要在意'''
     def __init__(self, data, BUFFERSIZE=1024):
         self.__data = data
         self.BUFFERSIZE = BUFFERSIZE
