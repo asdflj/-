@@ -23,7 +23,8 @@ class Server:
         self.__port = port
         self.__sockfd = self.__main_socket(host,port)
         self.pool = pool
-        self.game_num = {x: {'Users': [], 'Process': None,'UserExit':self.sendUserOutMsg,'Communication':multiprocessing.Pipe(False)} for x in range(pool)}
+        self.game_num = {x: {'Users': [], 'Process': None,'UserExit':self.sendUserOutMsg,
+                             'Communication':multiprocessing.Pipe(False)} for x in range(pool)}
         self.__addr = (host, port)
         self.lock  = Lock()
 
@@ -93,39 +94,33 @@ class Server:
                     #当人数不满３人时，已经有新的进程的时候，使新人加入该桌游戏
                     self.game_num[i]['Communication'][1].send(userInfo)
                 break
-        #len(self.game_num[i]['Users']) == 3
         self.lock.release()  #解锁
-
 
     #开始这桌的游戏
     @staticmethod
     def start_game(d_msg,num):
         room = game_room.Game(d_msg,num)
-        #等待用户加入
-        t = Thread(target=room.waitUserJoin)
-        t.start()
-        #循环等待用户接入
         while True:
+            #主流程
             if len(d_msg['Users']) == 3:
                 #发送开始游戏信息
                 for i in d_msg['Users']:
                     msg = i.convert('开始游戏', 'msg')
                     i.sendMessage(msg)
-
-            if len(d_msg['Users']) == 0:
+                #执行游戏流程
+                # 将发牌导出到列表
+                paly1, paly2, paly3, dipai = fapai()
+                paly1_fh = paixu(paly1)
+                paly2_fh = paixu(paly2)
+                paly3_fh = paixu(paly3)
+                dipai_fh = paixu(dipai)
+                d_msg['Users'][0].sendMessage(d_msg['Users'][0].convert(repr(paly1_fh), 'puker'))
+                d_msg['Users'][1].sendMessage(d_msg['Users'][1].convert(repr(paly2_fh), 'puker'))
+                d_msg['Users'][2].sendMessage(d_msg['Users'][2].convert(repr(paly3_fh), 'puker'))
+            elif len(d_msg['Users']) == 0:
                 return
-        t.join()
-        #游戏过程
-        # 将发牌导出到列表
-        paly1, paly2, paly3, dipai = fapai()
-        paly1_fh = paixu(paly1)
-        paly2_fh = paixu(paly2)
-        paly3_fh = paixu(paly3)
-        dipai_fh = paixu(dipai)
-        d_msg['Users'][0].sendMessage(d_msg['Users'][0].convert(repr(paly1_fh),'puker'))
-        d_msg['Users'][1].sendMessage(d_msg['Users'][1].convert(repr(paly2_fh),'puker'))
-        d_msg['Users'][2].sendMessage(d_msg['Users'][2].convert(repr(paly3_fh),'puker'))
-
+            else:
+                time.sleep(1)
 
     #GM命令
     def gameCommand(self):

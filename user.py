@@ -18,7 +18,6 @@ class User(Protocal):
     def register(self):
         '''注册用户'''
         pass
-
     def setUserPwd(self,user):
         '''user格式(username,passsword)'''
         self.username,self.password=user
@@ -28,6 +27,9 @@ class User(Protocal):
     def setname(self,name):
         '''设置用户名'''
         self.name=name
+    def setId(self,id):
+        '''设置该用户是否是地主'''
+        self.id = id
     def closeSockfd(self):
         '''用户登出'''
         self.sendMessage(self.convert(self.username,'loginOut'))
