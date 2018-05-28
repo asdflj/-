@@ -71,7 +71,10 @@ class My_ptl:
         length = self.__get_recv_length(data.decode())
         bdata += b"{'length': %d" % length
         while True:
-            data = self.__sockfd.recv(self.BUFFERSIZE)
+			if length > self.BUFFERSIZE:
+                data = self.__sockfd.recv(self.BUFFERSIZE)
+			else:
+                data = self.__sockfd.recv(length)
             length -= self.BUFFERSIZE
             bdata += data
 			if callback != None:  #每次接收回调函数，默认为空可用于获取速度
