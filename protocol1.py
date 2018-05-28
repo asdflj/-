@@ -64,7 +64,7 @@ class My_ptl:
         password = data.split(',')[1].split(':')[1]
         return (username, password)
 
-    def recv(self):
+    def recv(self,callback=None):
         '''按照标准协议接收并返回一个可迭代对象'''
         bdata = bytes()
         data = self.__sockfd.recv(21)
@@ -74,6 +74,8 @@ class My_ptl:
             data = self.__sockfd.recv(self.BUFFERSIZE)
             length -= self.BUFFERSIZE
             bdata += data
+			if callback != None:  #每次接收回调函数，默认为空可用于获取速度
+				callback()
             if length <= 0:
                 return pData(bdata, self.BUFFERSIZE)
 
