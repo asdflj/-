@@ -1,10 +1,10 @@
 import multiprocessing
-from threading import Thread
+from threading import Thread, Lock
 from user import User
 from game_room import *
 import socket
 from test import *
-
+import game_room
 class Server:
     #创建主套接字
     @staticmethod
@@ -19,18 +19,18 @@ class Server:
     #初始化服务器
     def __init__(self,host,port,pool):
         self.recvUserOutMsg,self.sendUserOutMsg=multiprocessing.Pipe()
-        self.__host=host
-        self.__port=port
-        self.__sockfd=self.__main_socket(host,port)
-        self.pool=pool
+        self.__host = host
+        self.__port = port
+        self.__sockfd = self.__main_socket(host,port)
+        self.pool = pool
         self.game_num = {x: {'Users': [], 'Process': None,'UserExit':self.sendUserOutMsg,'Communication':multiprocessing.Pipe(False)} for x in range(pool)}
-        self.__addr=(host,port)
-        
+        self.__addr = (host, port)
+        self.lock  = Lock()
 
 
     #创建新的线程来处理新连接
     def newThread(self,connfd):
-        t=Thread(target=self.handler,args=(connfd,))
+        t = Thread(target=self.handler, args=(connfd,))
         t.setDaemon(True)
         t.start()
 
@@ -53,7 +53,7 @@ class Server:
         if data['title'] == 'register':
             userInfo.register(data['data'])   #注册用户
         elif data['title'] == 'login':
-            userInfo.setUserPwd(userInfo.splitUserPwd(data['data'])) 
+            userInfo.setUserPwd(userInfo.splitUserPwd(data['data']))
             self.login(userInfo)#登录游戏
         else:
             userInfo.closeSockfd()
@@ -66,7 +66,7 @@ class Server:
                 if user in self.game_num[i]['Users']:
                     self.pool += 1
                     del self.game_num[i]['Users'][self.game_num[i]['Users'].index(user)]
-                    if len(game_num[i]['Users']) == 0:  #重置该桌的状态
+                    if len(self.game_num[i]['Users']) == 0:  #重置该桌的状态
                         self.game_num[i]['Users'] =[]
                         self.game_num[i]['Process']=None
                         # {'Users':[],'Process':None,'UserExit':self.sendUserOutMsg}
@@ -74,30 +74,48 @@ class Server:
     #用户登陆
     def login(self,userInfo):
         if userInfo.checkAuth(self.game_num) and self.pool != 0:  # 认证用户 #检测玩家是否满员
+            self.lock.acquire() #添加锁
             userInfo.sendMessage(userInfo.convert('login','ok'))
         else:
             userInfo.sendMessage(userInfo.convert('login','error'))
-            return 
+            return
         for i in self.game_num: #安排座位
             if len(self.game_num[i]['Users']) < 3:
                 self.pool-=1
                 self.game_num[i]['Users'].append(userInfo)
                 print('玩家来自',userInfo.addr,'登录',end='\n请输入要执行的命令>')
-                if len(self.game_num[i]['Users']) == 3 and self.game_num[i]['Process']==None:
-                    p = multiprocessing.Process(target=self.start_game, args=(self.game_num[i], i))  # 创建新的进程来管理这桌游戏
+                if self.game_num[i]['Process']==None:
+                    # 创建新的进程来管理这桌游戏
+                    p = multiprocessing.Process(target=self.start_game, args=(self.game_num[i], i))
                     p.start()
                     self.game_num[i]['Process'] = p
                 else:
-                    self.game_num[i]['Communication'][1].send(userInfo) #当人数不满３人时，已经有新的进程的时候，使新人加入该桌游戏
+                    #当人数不满３人时，已经有新的进程的时候，使新人加入该桌游戏
+                    self.game_num[i]['Communication'][1].send(userInfo)
                 break
-
+        #len(self.game_num[i]['Users']) == 3
+        self.lock.release()  #解锁
 
 
     #开始这桌的游戏
     @staticmethod
     def start_game(d_msg,num):
-        t = Thread(target=chat,args=(d_msg['Users'],))
+        room = game_room.Game(d_msg,num)
+        #等待用户加入
+        t = Thread(target=room.waitUserJoin)
         t.start()
+        #循环等待用户接入
+        while True:
+            if len(d_msg['Users']) == 3:
+                #发送开始游戏信息
+                for i in d_msg['Users']:
+                    msg = i.convert('开始游戏', 'msg')
+                    i.sendMessage(msg)
+
+            if len(d_msg['Users']) == 0:
+                return
+        t.join()
+        #游戏过程
         # 将发牌导出到列表
         paly1, paly2, paly3, dipai = fapai()
         paly1_fh = paixu(paly1)
@@ -108,10 +126,6 @@ class Server:
         d_msg['Users'][1].sendMessage(d_msg['Users'][1].convert(repr(paly2_fh),'puker'))
         d_msg['Users'][2].sendMessage(d_msg['Users'][2].convert(repr(paly3_fh),'puker'))
 
-        for i in d_msg['Users']:
-            msg = i.convert('开始游戏','msg')
-            i.sendMessage(msg)
-        t.join()
 
     #GM命令
     def gameCommand(self):
