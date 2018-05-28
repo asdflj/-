@@ -6,8 +6,10 @@ import os
     author ： 854865755
     Create on Sat May 26 12:27:42 2018
 '''
+
+
 class My_ptl:
-    def __init__(self, sockfd,BUFFERSIZE=1024):
+    def __init__(self, sockfd, BUFFERSIZE=1024):
         '''初始化该协议
         sockfd(套接字),BUFFERSIZE(缓冲区大小)默认为1024'''
         self.__sockfd = sockfd
@@ -15,41 +17,45 @@ class My_ptl:
         self.host, self.port = self.addr
         self.fileno = self.__sockfd.fileno()
         self.BUFFERSIZE = BUFFERSIZE
+
     def baseUserPwd(self, username, password, title):
         '''提供基础的用户名密码转换为标准协议格式'''
         return self.convert('username:%s,password:%s' % (username, password), title)
+
     def getSockfd(self):
         '''返回套接字'''
         return self.__sockfd
+
     def convert(self, data, title, data_type='str'):
         '''把数据转换为标准协议
            dataType str or file
         '''
         titleLength = len(title)+9
         ctimeLength = 38
-        headSize=13+titleLength+ctimeLength
+        headSize = 13+titleLength+ctimeLength
         if data_type == 'str':
             if len(data) < 1000000000:
                 ldata = len(data)+2+headSize
                 ldata = str(ldata).ljust(10, 'x')
                 result = "{'length': %(ldata)s, 'title': '%(title)s', 'time': '%(time)s', 'data': '%(data)s'}" %\
-                    {'ldata': ldata, 'title': title, 'data': data,'time': ctime()}
+                    {'ldata': ldata, 'title': title, 'data': data, 'time': ctime()}
             else:
                 raise '文本长度太长'
-        elif data_type =='file':
-            fileName = data 
+        elif data_type == 'file':
+            fileName = data
             if not os.path.isfile(fileName):
                 raise '文件不存在'
             fileSize = os.path.getsize(fileName)
             if not fileSize:
                 raise '文件长度为0'
-            with open(fileName,'rb')as fp:
-                fileData= repr(fp.read())
-                result = "{'length': %(fileSize)s, 'title': '%(title)s', 'time': '%(time)s', 'data': %(data)s}"%\
-                {'fileSize': str(len(fileData)+headSize).ljust(10, 'x'), 'title': title,'time': ctime(),'data':fileData}
+            with open(fileName, 'rb')as fp:
+                fileData = repr(fp.read())
+                result = "{'length': %(fileSize)s, 'title': '%(title)s', 'time': '%(time)s', 'data': %(data)s}" %\
+                    {'fileSize': str(len(fileData)+headSize).ljust(10, 'x'),
+                     'title': title, 'time': ctime(), 'data': fileData}
         else:
             raise '类型错误'
-        return pData(result,self.BUFFERSIZE)
+        return pData(result, self.BUFFERSIZE)
 
     def splitUserPwd(self, data):
         '''提供基础的分割字符中的用户名和密码返回为元组
@@ -69,7 +75,7 @@ class My_ptl:
             length -= self.BUFFERSIZE
             bdata += data
             if length <= 0:
-                return pData(bdata,self.BUFFERSIZE)
+                return pData(bdata, self.BUFFERSIZE)
 
     @staticmethod
     def __get_recv_length(data):
@@ -79,7 +85,7 @@ class My_ptl:
             return int(length)
         return 0
 
-    def getMessage(self,convertToDict=False):
+    def getMessage(self, convertToDict=False):
         '''接收信息
         convertToDict 是否转换为字典格式'''
         data = self.recv()
@@ -87,7 +93,8 @@ class My_ptl:
             return eval(data.getAll())
         else:
             return data.getAll()
-    def sendMessage(self,object):
+
+    def sendMessage(self, object):
         '''发送信息object为生成的协议对象'''
         for i in object:
             self.__sockfd.send(i.encode())
@@ -97,25 +104,30 @@ class My_ptl:
         '''关闭套接字'''
         self.__sockfd.close()
 
+
 class pData:
-    def __init__(self,data,BUFFERSIZE=1024):
+    def __init__(self, data, BUFFERSIZE=1024):
         self.__data = data
-        self.BUFFERSIZE= BUFFERSIZE
+        self.BUFFERSIZE = BUFFERSIZE
+
     def __iter__(self):
         self.__cur_pos = 0
         return self
+
     def __next__(self):
         while True:
             self.__cur_pos += 1
-            result = self.__data[self.BUFFERSIZE * (self.__cur_pos - 1):self.BUFFERSIZE * self.__cur_pos]
+            result = self.__data[self.BUFFERSIZE *(self.__cur_pos - 1):self.BUFFERSIZE * self.__cur_pos]
             if not len(result):
                 raise StopIteration
             return result
+
     def getAll(self):
         data = bytes()
         for i in self:
-            data+=i
+            data += i
         return data
-    def setBufferSize(self,size):
+
+    def setBufferSize(self, size):
         '''设置输出的信息长度'''
         self.BUFFERSIZE = size
