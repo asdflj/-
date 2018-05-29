@@ -61,15 +61,20 @@ class Server:
     #退出游戏时清理该桌的信息
     def clearGameDesk(self):
         while True:
-            user = self.recvUserOutMsg.recv()
+            user_fileno = self.recvUserOutMsg.recv()
+            pool = self.pool
             for i in self.game_num:
-                if user in self.game_num[i]['Users']:
-                    self.pool += 1
-                    del self.game_num[i]['Users'][self.game_num[i]['Users'].index(user)]
-                    if len(self.game_num[i]['Users']) == 0:  #重置该桌的状态
-                        self.game_num[i]['Users'] =[]
-                        self.game_num[i]['Process']=None
-                        # {'Users':[],'Process':None,'UserExit':self.sendUserOutMsg}
+                for user in self.game_num[i]['Users']:
+                    if user_fileno == user.fileno:
+                        print('玩家来自', user.addr, '退出', end='\n请输入要执行的命令>')
+                        self.pool += 1
+                        del self.game_num[i]['Users'][self.game_num[i]['Users'].index(user)]
+                        if len(self.game_num[i]['Users']) == 0:  #重置该桌的状态
+                            self.game_num[i]['Users'] =[]
+                            self.game_num[i]['Process']=None
+                            # {'Users':[],'Process':None,'UserExit':self.sendUserOutMsg}
+                        break
+                if pool < self.pool: #完成信息清理 退出循环
                     break
     #用户登陆
     def login(self,userInfo):
@@ -88,7 +93,7 @@ class Server:
                     # 创建新的进程来管理这桌游戏
                     p = multiprocessing.Process(target=self.start_game, args=(self.game_num[i], i))
                     p.start()
-                    self.game_num[i]['Process'] = p
+                    self.game_num[i]['Process'] = p.pid
                 else:
                     #当人数不满３人时，已经有新的进程的时候，使新人加入该桌游戏
                     self.game_num[i]['Communication'][1].send(userInfo)

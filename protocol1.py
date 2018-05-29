@@ -35,7 +35,7 @@ class My_ptl:
         headSize = 13+titleLength+ctimeLength
         if data_type == 'str':
             if len(data) < 1000000000:
-                ldata = len(data)+2+headSize
+                ldata = len(data.encode())+2+headSize
                 ldata = str(ldata).ljust(10, 'x')
                 result = "{'length': %(ldata)s, 'title': '%(title)s', 'time': '%(time)s', 'data': '%(data)s'}" %\
                     {'ldata': ldata, 'title': title, 'data': data, 'time': ctime()}

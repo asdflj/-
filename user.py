@@ -32,5 +32,5 @@ class User(Protocal):
         self.id = id
     def closeSockfd(self):
         '''用户登出'''
-        self.sendMessage(self.convert(self.username,'loginOut'))
+        self.sendMessage(self.convert('ok','loginOut'))
         super().closeSockfd()
