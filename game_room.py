@@ -1,6 +1,8 @@
 from select import *
 import time
 from threading import Thread
+from test import *
+
 #初始化服务类
 class Game:
     def __init__(self,roomInfo,roomNumber):
@@ -73,3 +75,22 @@ class Game:
             if i is not user:
                 send_msg = i.convert(msg,title)  # 把消息转换成协议格式
                 i.sendMessage(send_msg)
+
+    def startGame(self):
+            self.sendRoomMessage('开始游戏', 'msg')
+            # 执行游戏流程
+            # 将发牌导出到列表
+            paly1, paly2, paly3, dipai = fapai()
+            paly1_fh = paixu(paly1)
+            paly2_fh = paixu(paly2)
+            paly3_fh = paixu(paly3)
+            dipai_fh = paixu(dipai)
+            self.users[0].sendMessage(self.users[0].convert(repr(paly1_fh), 'puker'))
+            self.users[1].sendMessage(self.users[1].convert(repr(paly2_fh), 'puker'))
+            self.users[2].sendMessage(self.users[2].convert(repr(paly3_fh), 'puker'))
+            self.process()   #流程循环迭代
+
+    def process(self):  #方案1使用迭代的方式来执行游戏的进程
+        pass
+    # if not user.puker:
+    #     return

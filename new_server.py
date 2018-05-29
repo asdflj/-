@@ -1,9 +1,8 @@
 import multiprocessing
-from threading import Thread, Lock
+from threading import Thread,Lock
 from user import User
 from game_room import *
 import socket
-from test import *
 import game_room
 class Server:
     #创建主套接字
@@ -104,21 +103,9 @@ class Server:
             #主流程
             if len(d_msg['Users']) == 3:
                 #发送开始游戏信息
-                for i in d_msg['Users']:
-                    msg = i.convert('开始游戏', 'msg')
-                    i.sendMessage(msg)
-                #执行游戏流程
-                # 将发牌导出到列表
-                paly1, paly2, paly3, dipai = fapai()
-                paly1_fh = paixu(paly1)
-                paly2_fh = paixu(paly2)
-                paly3_fh = paixu(paly3)
-                dipai_fh = paixu(dipai)
-                d_msg['Users'][0].sendMessage(d_msg['Users'][0].convert(repr(paly1_fh), 'puker'))
-                d_msg['Users'][1].sendMessage(d_msg['Users'][1].convert(repr(paly2_fh), 'puker'))
-                d_msg['Users'][2].sendMessage(d_msg['Users'][2].convert(repr(paly3_fh), 'puker'))
+                room.startGame()
             elif len(d_msg['Users']) == 0:
-                return
+                return #没有玩家时结束这个进程
             else:
                 time.sleep(1)
 
