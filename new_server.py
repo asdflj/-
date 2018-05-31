@@ -45,7 +45,6 @@ class Server:
         while True:
             connfd, addr = self.__sockfd.accept()
             self.newThread(connfd)
-            connfd.close()
 
     #处理客户请求
     def handler(self,connfd):
