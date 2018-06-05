@@ -129,11 +129,12 @@ class PData:
             return result
 
     def getAll(self):
-        data = bytes()
-        for i in self:
-            data += i
-        return data
+        return self.__data
 
     def setBufferSize(self, size):
         '''设置输出的信息长度'''
         self.BUFFERSIZE = size
+    def __str__(self):
+        return self.__data
+    def __repr__(self):
+        return 'PData(%s, %s)'%(self.__data, self.BUFFERSIZE)
