@@ -136,5 +136,6 @@ class PData:
         self.BUFFERSIZE = size
     def __str__(self):
         return self.__data
+
     def __repr__(self):
         return 'PData(%s, %s)'%(self.__data, self.BUFFERSIZE)

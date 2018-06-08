@@ -15,9 +15,9 @@ class Game:
         t = Thread(target=self.waitUserJoin)   #循环等待用户接入
         t.setDaemon(True)
         t.start()
-        t1 = Thread(target=self.getMessage)  #启用消息处理
-        t1.setDaemon(True)
-        t1.start()
+        # t1 = Thread(target=self.getMessage)  #启用消息处理
+        # t1.setDaemon(True)
+        # t1.start()  #改为游戏主流程来控制消息接收
 
     #接收消息并发给处理函数
     def getMessage(self):
@@ -79,8 +79,8 @@ class Game:
 
     def startGame(self):
             self.sendRoomMessage('开始', 'msg')
-            while 1:
-                pass
+            # while 1:
+            #     pass
             # 执行游戏流程
             # 将发牌导出到列表
             # paly1, paly2, paly3, dipai = fapai()
