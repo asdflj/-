@@ -1,0 +1,13 @@
+QPushButton{
+    width:200px;
+    height:60px;
+
+}
+
+QLineEdit{
+    height: 35px;
+    width:190px;
+    background: #572A13;
+    border:0;
+    font-size:20px;
+}
