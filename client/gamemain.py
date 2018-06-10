@@ -20,6 +20,7 @@ class Main:
             pygame.display.flip()
 
     def drawBackGroundImage(self):
+        '''绘制背景图片'''
         self.backgroundImg =  pygame.image.load(self.Set.backgroundImage)
         self.screen.blit(self.backgroundImg, (0, -24))  # 绘制背景图片
         self.Myself = self.drawSelf()  # 绘制自己
@@ -27,23 +28,29 @@ class Main:
         self.rightUser = self.drawRightUser() #绘制右边玩家
 
     def handlerEvent(self):
+        '''处理事件'''
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
 
     def drawSelf(self): #初始化绘制自己
+        '''绘制自己'''
         return PSelf(pygame,self.Set.nongmin,self.screen)
 
     def drawRightUser(self):
+        '''绘制右边玩家'''
         return PRight(pygame, self.Set.otherNongmin, self.screen)
 
     def drawLeftUser(self):
+        '''绘制左边玩家'''
         return PLeft(pygame, self.Set.otherDizhu, self.screen)
 
     def drawOutPokerArea(self):
+        '''绘制出牌区域'''
         pass
 
     def loadPackge(self):
+        '''加载扑克资源包'''
         poker = []
         for i in self.Set.poker:
             image = pygame.image.load(i).get_rect()
