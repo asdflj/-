@@ -1,19 +1,19 @@
 from game_liucheng import Liucheng as L
+from game_tool import Tool as T
+
 
 def main():
-    paly1, paly2, paly3, dipai = L.fenpai()
-    
-    king_num,lis_123= L.jiaodizhu()
-    
-    paly1,paly2,paly3 = L.fendizhu\
-        (paly1, paly2, paly3, dipai,king_num)
-        #paly系列为原始列表
-    win_num=L.game_time_start(play1,play2,play3,lis_123)
+    play1, play2, play3, dipai = L.fenpai()
 
-    L.end_result()
+    king_num, lis_123 = L.jiaodizhu()
+
+    play1, play2, play3 = L.fendizhu(play1, play2, play3, dipai, king_num)
+    # play系列为原始列表
+    win_num = L.game_time_start(play1, play2, play3, lis_123)
+
+    L.end_result(king_num, win_num)
 
     print("Good Game!")
-
 
 
 if __name__ == '__main__':
