@@ -96,7 +96,7 @@ class Screen(QWidget):
         '''点击了注册按钮'''
         username, password = self.userInputCheck()
         if username == None or password == None: #判断
-            self.myMessageBox('用户名 密码不能为空')
+            self.myMessageBox('提示','用户名或密码不能为空')
             return
         if self.user.register(self.myMessageBox,username,password):
             self.btnLoginClick()
