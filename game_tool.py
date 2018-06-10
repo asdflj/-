@@ -1,6 +1,9 @@
+
 import random
 from game_connect import Connect as C
 from game_rule import Rule as R
+
+
 class Tool(object):
     def fapai():
         list_size = []
@@ -53,154 +56,197 @@ class Tool(object):
             ser_list.append(dic_cards[x])
         return ser_list
 
-    
-
-    
-
-    def gai_1_le(pass_num,up,down,p1):
-        #sy 索引 lis 索引拿p1 
+    def gai_1_le(pass_num, up, down, p1):
         while True:
-            sy = C.sr_p1()
-            sy_fh= sorted(sy, reverse=True)
-            sy_fh_fy=R.many_first(sy_fh)
-            lis=[]
+            C.send_to_p1(R.fanyi(p1))  # 看手牌
+            sy = C.sr_p1(p1)  # 得到打牌序列
+            sy_fh = sorted(sy, reverse=True)  # 排序
+            lis = []
             for x in sy:
-                s=p1[x]
+                s = p1[x]
                 lis.append(s)
-                lis=R.dibanchu(lis)
-                lis=R.many_first(lis)
-                daxiao_lis = R.fanhui_xulie(lis)
-                if daxiao_lis[0]=100:
+            lis_copy = lis  # 备份
+            lis = R.dibanchu(lis)  # 转换为实际大小
+            lis = R.many_first(lis)  # 排序多前少后
+            lis_outparper = R.chupaifanyi(lis, lis_copy)
+            daxiao_lis = R.fanhui_xulie(lis)  # 拿到相应牌行编号
+            if daxiao_lis[0] == 100:
+                continue  # 不符合规则
+            if daxiao_lis[0] == 4:
+                if pass_num == 0:
+                      # 必须出牌 no pass!
                     continue
-                if daxiao_lis[0]==4 and pass_num != 0:
-                    pass_num=2
-                    C.send_to_all("pass")
-                    return pass_num,up,down,p1
-                #以上为pass
-                else:
-                    if pass_num ==0:
-                        if daxiao_lis != []:
-                            up=daxiao_lis
-                            for x in sy_fh:
-                                del p1[x]
-                            C.send_to_p1(T.fanyi(p1))
-                            C.send_to_all(T.fanyi(sy_fh_fy))
+                C.send_to_all("pass")
+                pass_num -= 1
+                return pass_num, up, down, p1  # pass
+            else:
+                if pass_num == 0:
+                    up = daxiao_lis
+                    for x in sy_fh:
+                        del p1[x]
+                    C.send_to_p1(R.fanyi(p1))
+                    C.send_to_all(R.fanyi(lis_outparper))
+                    pass_num = 2
+                    return pass_num, up, down, p1
 
-                            pass_num=2
-                            return pass_num,up,down,p1
-                        else:
-                            continue
+                elif pass_num == 1:
+                    down = daxiao_lis
+                    up, down = R.bidaxiao(up, down)
+                    if down[-1] == 50:
+                        pass_num == 1
+                        continue
+                    if down[0] == 4:
+                        pass_num = 0
+                        return pass_num, up, down, p1
+                    for x in sy_fh:
+                        del p1[x]
+                    C.send_to_p1(R.fanyi(p1))
+                    C.send_to_all(R.fanyi(lis_outparper))
+                    pass_num = 2
+                    return pass_num, up, down, p1
 
-                    elif pass_num == 1:
-                        down=daxiao_lis
-                        up,down=R.bidaxiao(up,down)
-                        for x in sy_fh:
-                            del p1[x]
-                        C.send_to_p1(T.fanyi(p1))
-                        C.send_to_all(T.fanyi(sy_fh_fy))
-                        pass_num=2
-                        return pass_num,up,down,p1
-                    elif pass_num ==2:
-                        down=daxiao_lis
-                        up,down=R.bidaxiao(up,down)
-                        for x in sy_fh:
-                            del p1[x]
-                        C.send_to_p1(T.fanyi(p1))
-                        C.send_to_all(T.fanyi(sy_fh_fy))
-                        return pass_num,up,down,p1
-    
-    def gai_2_le(pass_num,up,down,p2):
+                elif pass_num == 2:
+                    down = daxiao_lis
+                    up, down = R.bidaxiao(up, down)
+                    if down[-1] == 50:
+                        pass_num == 2
+                        continue
+                    if down[0] == 4:
+                        pass_num = 1
+                        return pass_num, up, down, p1
+                    for x in sy_fh:
+                        del p1[x]
+                    C.send_to_p1(R.fanyi(p1))
+                    C.send_to_all(R.fanyi(lis_outparper))
+
+                    return pass_num, up, down, p1
+
+    def gai_2_le(pass_num, up, down, p2):
         while True:
-            sy = C.sr_p2()
-            sy_fh= sorted(sy, reverse=True)
-            sy_fh_fy=R.many_first(sy_fh)
-            lis=[]
+            C.send_to_p2(R.fanyi(p2))  # 看手牌
+            sy = C.sr_p2(p2)  # 得到打牌序列
+            sy_fh = sorted(sy, reverse=True)  # 排序
+            lis = []
             for x in sy:
-                s=p2[x]
+                s = p2[x]
                 lis.append(s)
-                lis=R.dibanchu(lis)
-                lis=R.many_first(lis)
-                daxiao_lis = R.fanhui_xulie(lis)
-                if daxiao_lis[0]=100:
-                            continue
-                if daxiao_lis[0]==4 and pass_num != 0:
-                    pass_num=2
-                    C.send_to_all("pass")
-                    return pass_num,up,down,p2
-                else:
-                    if pass_num ==0:
-                        if daxiao_lis != []:
-                            up=daxiao_lis
-                            for x in sy_fh:
-                                del p2[x]
-                                C.send_to_p2(T.fanyi(p2))
-                                C.send_to_all(T.fanyi(sy_fh_fy))
-                            pass_num=2
-                            return pass_num,up,down,p2
-                        else:
-                            continue
-                    elif pass_num == 1:
-                        down=daxiao_lis
-                        up,down=R.bidaxiao(up,down)
-                        for x in sy_fh:
-                            del p2[x]
-                            C.send_to_p2(T.fanyi(p2))
-                            C.send_to_all(T.fanyi(sy_fh_fy))
-                        pass_num=2
-                        return pass_num,up,down,p2
-                    elif pass_num ==2:
-                        down=daxiao_lis
-                        up,down=R.bidaxiao(up,down)
-                        for x in sy_fh:
-                            del p2[x]
-                            C.send_to_p2(T.fanyi(p2))
-                            C.send_to_all(T.fanyi(sy_fh_fy))
-                        return pass_num,up,down,p2
-    
-    def gai_3_le(pass_num,up,down,p3):
-        while True:           
-            sy = C.sr_p3()
-            sy_fh= sorted(sy, reverse=True)
-            sy_fh_fy=R.many_first(sy_fh)
-            lis=[]
-            for x in sy:
-                s=p3[x]
-                lis.append(s)
-                lis=R.dibanchu(lis)
-                lis=R.many_first(lis)
-                daxiao_lis = R.fanhui_xulie(lis)
-                if daxiao_lis[0]=100:
+            lis_copy = lis  # 备份
+            lis = R.dibanchu(lis)  # 转换为实际大小
+            lis = R.many_first(lis)  # 排序多前少后
+            lis_outparper = R.chupaifanyi(lis, lis_copy)
+            daxiao_lis = R.fanhui_xulie(lis)  # 拿到相应牌行编号
+            if daxiao_lis[0] == 100:
+                continue  # 不符合规则
+            if daxiao_lis[0] == 4:
+                if pass_num == 0:
+                      # 必须出牌 no pass!
                     continue
-                if daxiao_lis[0]==4 and pass_num != 0:
-                    pass_num=2
-                    C.send_to_all("pass")
-                    return pass_num,up,down,p3
-                else:
-                    if pass_num ==0:
-                        if daxiao_lis != []:
-                            up=daxiao_lis
-                            for x in sy_fh:
-                                del p3[x]
-                                C.send_to_p3(T.fanyi(p3))
-                                C.send_to_all(T.fanyi(sy_fh_fy))
-                            pass_num=2
-                            return pass_num,up,down,p3
-                        else:
-                            continue
-                    elif pass_num == 1:
-                        down=daxiao_lis
-                        up,down=R.bidaxiao(up,down)
-                        for x in sy_fh:
-                            del p3[x]
-                            C.send_to_p3(T.fanyi(p3))
-                            C.send_to_all(T.fanyi(sy_fh_fy))
-                        pass_num=2
-                        return pass_num,up,down,p3
-                    elif pass_num ==2:
-                        down=daxiao_lis
-                        up,down=R.bidaxiao(up,down)
-                        for x in sy_fh:
-                            del p3[x]
-                            C.send_to_p3(T.fanyi(p3))
-                            C.send_to_all(T.fanyi(sy_fh_fy))
-                        return pass_num,up,down,p3
+                C.send_to_all("pass")
+                pass_num -= 1
+                return pass_num, up, down, p2  # pass
+            else:
+                if pass_num == 0:
+                    up = daxiao_lis
+                    for x in sy_fh:
+                        del p2[x]
+                    C.send_to_p2(R.fanyi(p2))
+                    C.send_to_all(R.fanyi(lis_outparper))
+                    pass_num = 2
+                    return pass_num, up, down, p2
+
+                elif pass_num == 1:
+                    down = daxiao_lis
+                    up, down = R.bidaxiao(up, down)
+                    if down[-1] == 50:
+                        pass_num == 1
+                        continue
+                    if down[0] == 4:
+                        pass_num = 0
+                        return pass_num, up, down, p2
+                    for x in sy_fh:
+                        del p2[x]
+                        C.send_to_p2(R.fanyi(p2))
+                        C.send_to_all(R.fanyi(lis_outparper))
+                    pass_num = 2
+                    return pass_num, up, down, p2
+
+                elif pass_num == 2:
+                    down = daxiao_lis
+                    up, down = R.bidaxiao(up, down)
+                    if down[-1] == 50:
+                        pass_num == 2
+                        continue
+                    if down[0] == 4:
+                        pass_num = 1
+                        return pass_num, up, down, p2
+                    for x in sy_fh:
+                        del p2[x]
+                    C.send_to_p2(R.fanyi(p2))
+                    C.send_to_all(R.fanyi(lis_outparper))
+
+                    return pass_num, up, down, p2
+
+    def gai_3_le(pass_num, up, down, p3):
+        while True:
+            C.send_to_p3(R.fanyi(p3))  # 看手牌
+            sy = C.sr_p3(p3)  # 得到打牌序列
+            sy_fh = sorted(sy, reverse=True)  # 排序
+            lis = []
+            for x in sy:
+                s = p3[x]
+                lis.append(s)
+            lis_copy = lis  # 备份
+            lis = R.dibanchu(lis)  # 转换为实际大小
+            lis = R.many_first(lis)  # 排序多前少后
+            lis_outparper = R.chupaifanyi(lis, lis_copy)
+            daxiao_lis = R.fanhui_xulie(lis)  # 拿到相应牌行编号
+            if daxiao_lis[0] == 100:
+                continue  # 不符合规则
+            if daxiao_lis[0] == 4:
+                if pass_num == 0:
+                      # 必须出牌 no pass!
+                    continue
+                C.send_to_all("pass")
+                pass_num -= 1
+                return pass_num, up, down, p3  # pass
+            else:
+                if pass_num == 0:
+                    up = daxiao_lis
+                    for x in sy_fh:
+                        del p3[x]
+                    C.send_to_p3(R.fanyi(p3))
+                    C.send_to_all(R.fanyi(lis_outparper))
+                    pass_num = 2
+                    return pass_num, up, down, p3
+
+                elif pass_num == 1:
+                    down = daxiao_lis
+                    up, down = R.bidaxiao(up, down)
+                    if down[-1] == 50:
+                        pass_num == 1
+                        continue
+                    if down[0] == 4:
+                        pass_num = 0
+                        return pass_num, up, down, p3
+                    for x in sy_fh:
+                        del p3[x]
+                    C.send_to_p3(R.fanyi(p3))
+                    C.send_to_all(R.fanyi(lis_outparper))
+                    pass_num = 2
+                    return pass_num, up, down, p3
+
+                elif pass_num == 2:
+                    down = daxiao_lis
+                    up, down = R.bidaxiao(up, down)
+                    if down[-1] == 50:
+                        pass_num == 2
+                        continue
+                    if down[0] == 4:
+                        pass_num = 1
+                        return pass_num, up, down, p3
+                    for x in sy_fh:
+                        del p3[x]
+                    C.send_to_p3(R.fanyi(p3))
+                    C.send_to_all(R.fanyi(lis_outparper))
+
+                    return pass_num, up, down, p3
