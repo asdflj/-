@@ -4,6 +4,7 @@ from gamemain import Main
 def main():
     # mainWindow = Screen()
     gameWindow = Main('')
+    gameWindow.main_loop()
     # gameWindow = Main(window.user)
 
 
