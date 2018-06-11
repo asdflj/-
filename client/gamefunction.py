@@ -1,4 +1,5 @@
 import pygame
+import math
 class Player:
     def __init__(self,pygame,image,screen):
         self.pygame = pygame
@@ -7,6 +8,9 @@ class Player:
         self.rect = self.image.get_rect()
     def blitme(self):
         self.screen.blit(self.image,self.rect)
+    def showCard(self):
+        pass
+
 
 class PSelf(Player):
     def __init__(self,pygame,image,screen):
@@ -15,10 +19,27 @@ class PSelf(Player):
         # self.rect.y = self.rect.height
         self.rect.x = 50     #设置位置
         self.rect.y = 450
-    def showCard(self,Poker):
-        pass
-        # for i in Puker:
-            # image = self.pygame.image.load()
+        self.pokers = pygame.sprite.Group()  # 要绘制的手牌  精灵组类型
+
+    def showCard(self,poker):
+        '''绘制手上的手牌'''
+        width = 700
+        if len(poker) * 150 > width:  # 判断牌数量是否能存放下完整大小
+            lenght = math.floor(width / (len(poker) + 1))
+        else:
+            lenght = 105;
+        x = 0
+        self.pokers.empty() #清空精灵组
+        for i in poker:
+            x += lenght
+            if not i.pop:
+                rect = self.screen.blit(i.image, (120  + x, 430)) #绘制到屏幕上
+            else:
+                rect = self.screen.blit(i.image, (120 + x, 430-50))  # 绘制到屏幕上
+            i.setRect(rect)
+            self.pokers.add(i)  #添加到组
+
+
 
 
 class PLeft(Player):
@@ -42,22 +63,19 @@ class Poker(pygame.sprite.Sprite):
         self.path = path
         self.ID = ID
         self.image = pygame.image.load(path)
+        self.pop = False
         # self.image =pygame.transform.scale(self.image, (40, 50))
         # self.rect = self.image.get_rect()
 
     def setRect(self,rect):
         self.rect =rect
-    def up(self):
-        self.rect.top +=50;
 
-    def down(self):
-        self.rect  -=50;
 class Mouse(pygame.sprite.Sprite):
     def __init__(self,screen):
         super(Mouse, self).__init__()
         self.screen = screen
-        self.width = 10
-        self.height = 10
+        self.width = 1
+        self.height = 1
     def getPos(self):
         return pygame.mouse.get_pos()
     def drawPoint(self):
