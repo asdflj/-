@@ -4,6 +4,12 @@ from user import User
 from game_room import *
 import socket
 import game_room
+
+''' 服务器主模块 用于接收客户端请求并处理 
+	author : 854865755
+	crete on Sat May 26 12:27:42 2018
+	statu  : Finish
+''' 
 class Server:
     #创建主套接字
     @staticmethod

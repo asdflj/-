@@ -1,28 +1,48 @@
 import pygame
 import math
+
 class Player:
-    def __init__(self,pygame,image,screen):
+    def __init__(self,pygame,image,screen,cardbg,font,score):
         self.pygame = pygame
         self.image = self.pygame.image.load(image)
         self.screen = screen
         self.rect = self.image.get_rect()
+        # self.cardBackGround = self.pygame.image.load()
+        self.cardBackGround = pygame.transform.scale(cardbg, (40, 50))  #缩放提示牌大小
+        self.font = font
+        self.score = score
+
     def blitme(self):
         self.screen.blit(self.image,self.rect)
-    def showCard(self):
-        pass
 
+    def showCard(self,poker):
+        '''绘制剩余牌数在角色旁边'''
+        self.screen.blit(self.cardBackGround,(self.cardX,self.cardY))
+        length = len(poker)
+        text = self.font.render('%s'%length, True, (0,0,0))
+        self.screen.blit(text,(self.cardX+50,self.cardY+20))
+
+    def selectDiZhu(self):
+        '''选择地主'''
+        pass
+        # self.screen.blit(self.score,(self.scoreX,self.scoreY))
 
 class PSelf(Player):
-    def __init__(self,pygame,image,screen):
-        super(PSelf,self).__init__(pygame,image,screen)
+    def __init__(self,pygame,image,screen,cardbg,font,score):
+        super(PSelf,self).__init__(pygame,image,screen,cardbg,font,score)
         # self.rect.x = self.rect.width
         # self.rect.y = self.rect.height
         self.rect.x = 50     #设置位置
         self.rect.y = 450
         self.pokers = pygame.sprite.Group()  # 要绘制的手牌  精灵组类型
+        self.cardX = 30
+        self.cardY = 400
+        self.scoreX = 500
+        self.scoreY = 380
 
     def showCard(self,poker):
         '''绘制手上的手牌'''
+        super(PSelf, self).showCard(poker)
         width = 700
         if len(poker) * 150 > width:  # 判断牌数量是否能存放下完整大小
             lenght = math.floor(width / (len(poker) + 1))
@@ -39,23 +59,29 @@ class PSelf(Player):
             i.setRect(rect)
             self.pokers.add(i)  #添加到组
 
+    def selectDiZhu(self):
+        super(PSelf, self).selectDiZhu()
+        for score in self.score:
 
-
+            pass
 
 class PLeft(Player):
-    def __init__(self,pygame,image,screen):
-        super(PLeft,self).__init__(pygame,image,screen)
+    def __init__(self,pygame,image,screen,cardbg,font,score):
+        super(PLeft,self).__init__(pygame,image,screen,cardbg,font,score)
         self.image = self.pygame.transform.rotate(self.image,-130)
         self.rect.x = 0     #设置位置
         self.rect.y = -15
-
+        self.cardX = 200
+        self.cardY = 40
 
 class PRight(Player):
-    def __init__(self,pygame,image,screen):
-        super(PRight,self).__init__(pygame,image,screen)
+    def __init__(self,pygame,image,screen,cardbg,font,score):
+        super(PRight,self).__init__(pygame,image,screen,cardbg,font,score)
         self.image = self.pygame.transform.rotate(self.image,130)
         self.rect.x = 810     #设置位置
         self.rect.y = -15
+        self.cardX = 750
+        self.cardY = 40
 
 class Poker(pygame.sprite.Sprite):
     def __init__(self,path,ID):
