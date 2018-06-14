@@ -1,4 +1,4 @@
-
+'''工具类函数'''
 import random
 from game_connect import Connect as C
 from game_rule import Rule as R
@@ -6,6 +6,7 @@ from game_rule import Rule as R
 
 class Tool(object):
     def fapai():
+        #随机发牌函数
         list_size = []
         for x in range(54):
             list_size.append(x+1)
@@ -57,9 +58,10 @@ class Tool(object):
         return ser_list
 
     def gai_1_le(pass_num, up, down, p1):
+        '''此类函数处理玩家发牌中，是否规范，是否合法，是否为PASS'''
         while True:
             C.send_to_p1(R.fanyi(p1))  # 看手牌
-            sy = C.sr_p1(p1)  # 得到打牌序列
+            sy = C.sr_p1(p1)  # 得到玩家的出牌序列
             sy_fh = sorted(sy, reverse=True)  # 排序
             lis = []
             for x in sy:
@@ -67,29 +69,30 @@ class Tool(object):
                 lis.append(s)
             lis_copy = lis  # 备份
             lis = R.dibanchu(lis)  # 转换为实际大小
-            lis = R.many_first(lis)  # 排序多前少后
+            lis = R.many_first(lis)  # 排序数量多牌在前数量少的牌在后
             lis_outparper = R.chupaifanyi(lis, lis_copy)
-            daxiao_lis = R.fanhui_xulie(lis)  # 拿到相应牌行编号
+            daxiao_lis = R.fanhui_xulie(lis)  # 拿到相应牌值编号
             if daxiao_lis[0] == 100:
-                continue  # 不符合规则
+                continue  # 不符合规则，重新出牌
             if daxiao_lis[0] == 4:
                 if pass_num == 0:
-                      # 必须出牌 no pass!
+                      # 此时必须出牌不能PASS，可以随意出
                     continue
-                C.send_to_all("pass")
+                C.send_to_all("pass")#玩家没有出牌，表示PASS
                 pass_num -= 1
                 return pass_num, up, down, p1  # pass
             else:
-                if pass_num == 0:
+                if pass_num == 0:#随意出牌的情况
                     up = daxiao_lis
                     for x in sy_fh:
-                        del p1[x]
+                        del p1[x]#出牌成功，删除手中打出的牌
                     C.send_to_p1(R.fanyi(p1))
+                    #给所有玩家展示打出的牌
                     C.send_to_all(R.fanyi(lis_outparper))
                     pass_num = 2
                     return pass_num, up, down, p1
 
-                elif pass_num == 1:
+                elif pass_num == 1:#必须大于上家才能出的情况
                     down = daxiao_lis
                     up, down = R.bidaxiao(up, down)
                     if down[-1] == 50:
@@ -99,13 +102,14 @@ class Tool(object):
                         pass_num = 0
                         return pass_num, up, down, p1
                     for x in sy_fh:
-                        del p1[x]
+                        del p1[x]#出牌成功，删除手中打出的牌
                     C.send_to_p1(R.fanyi(p1))
+                    #给所有玩家展示打出的牌
                     C.send_to_all(R.fanyi(lis_outparper))
                     pass_num = 2
                     return pass_num, up, down, p1
 
-                elif pass_num == 2:
+                elif pass_num == 2:#须大于上家才能出的情况
                     down = daxiao_lis
                     up, down = R.bidaxiao(up, down)
                     if down[-1] == 50:
@@ -115,12 +119,13 @@ class Tool(object):
                         pass_num = 1
                         return pass_num, up, down, p1
                     for x in sy_fh:
-                        del p1[x]
+                        del p1[x]#出牌成功，删除手中打出的牌
                     C.send_to_p1(R.fanyi(p1))
+                    #给所有玩家展示打出的牌
                     C.send_to_all(R.fanyi(lis_outparper))
 
-                    return pass_num, up, down, p1
-
+                    return pass_num, up, down, p1#玩家出牌结束返回变量
+    #参照1注释               
     def gai_2_le(pass_num, up, down, p2):
         while True:
             C.send_to_p2(R.fanyi(p2))  # 看手牌
@@ -185,7 +190,7 @@ class Tool(object):
                     C.send_to_all(R.fanyi(lis_outparper))
 
                     return pass_num, up, down, p2
-
+    #参照1注释
     def gai_3_le(pass_num, up, down, p3):
         while True:
             C.send_to_p3(R.fanyi(p3))  # 看手牌

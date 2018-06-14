@@ -1,4 +1,4 @@
-
+#出牌规则类函数
 class Rule(object):
     def fanyi(list_picture):
         dic_cards = {
@@ -23,6 +23,7 @@ class Rule(object):
         return ser_list
 
     def dibanchu(lis):
+        #将牌转换为1-K
         lis_diban = []
         for x in lis:
             if x == 54:
@@ -33,6 +34,7 @@ class Rule(object):
         return lis_diban
 
     def chupaifanyi(lis_diban, lis_fanyi):
+           #打出的牌转换器
         lis_666 = []
         for x in lis_diban:
             for y in lis_fanyi:
@@ -41,7 +43,7 @@ class Rule(object):
                     lis_fanyi.remove(y)
         return lis_666
 
-    def many_first(lis):  # 出牌排序，待用不操作
+    def many_first(lis):  # 出牌排序
         count1 = []
         count2 = []
         count3 = []
@@ -62,7 +64,8 @@ class Rule(object):
         zong = count4+count3+count2+count1
         return zong
 
-    def fanhui_xulie(lis):  # 判断出牌是否符合规则，不符合返回，玩家不要返回空列表
+    def fanhui_xulie(lis):  
+    # 判断出牌是否符合规则，不符合返回，玩家PASS时返回空列表
         def much_first(lis):
             much = []
             count1 = []
@@ -85,7 +88,13 @@ class Rule(object):
 
             return count1, count2, count3, count4
 
-        def leixing(lis):  # 牌形选择
+        def leixing(lis):  # 牌形选择，出牌中相同牌最大数量
+            '''
+            1为单牌类型（单张或单顺）
+            2为对子类型（单对或连对）
+            3为飞机类型
+            4为炸弹
+            '''
             b = 0
             if lis != []:
                 for x in lis:
@@ -121,6 +130,7 @@ class Rule(object):
 
         def putong_panduan(lis):  # 牌型判断
             pt = []
+            #pt[-1]为大小
             b = leixing(lis)
             if b == 1:
                 if len(lis) == 1:
@@ -159,7 +169,7 @@ class Rule(object):
                 elif len(lis) == 8:
                     pt += [1, 4, 2, lis[0]]
                     return pt
-            pt += [100]  # 不符合规则返回１００
+            pt += [100]  # 不符合规则返回100
             return pt
 
         daxiao_list = []

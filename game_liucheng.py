@@ -1,3 +1,4 @@
+'''游戏流程类'''
 from game_tool import Tool as T
 from game_connect import Connect as C
 import random
@@ -8,12 +9,12 @@ class Liucheng(object):
     def fenpai():
         # 获得底牌和分牌
         play1, play2, play3, dipai = T.fapai()
-        # 初始化排序
+        # 排序并转换为图形
         play1_fh = T.paixu(play1)
         play2_fh = T.paixu(play2)
         play3_fh = T.paixu(play3)
         dipai_fh = T.paixu(dipai)
-
+        #分别将数据发送给玩家
         C.send_to_p1(T.fanyi(play1_fh))
         C.send_to_p2(T.fanyi(play2_fh))
         C.send_to_p3(T.fanyi(play3_fh))
@@ -21,6 +22,7 @@ class Liucheng(object):
         return play1_fh, play2_fh, play3_fh, dipai_fh
 
     def jiaodizhu():  # 叫地主
+        #随机生成先叫地主的人，生成叫地主顺序列表
         three = random.choice([1, 2, 3])
         if three == 1:
             lis = [1, 2, 3, 1]
@@ -31,6 +33,7 @@ class Liucheng(object):
         elif three == 3:
             lis = [3, 1, 2, 3]
             dizhu = 3
+        #根据顺序由每位玩家叫地主
         for x in lis:
             if x == 1:
                 a = C.dz_p1()
@@ -44,18 +47,20 @@ class Liucheng(object):
                 a = C.dz_p3()
                 if a == 'y':
                     dizhu = 3
+        #根据地主位置生成出牌顺序
         if dizhu == 1:
             lt = [1, 2, 3]
         elif dizhu == 2:
             lt = [2, 3, 1]
         elif dizhu == 3:
             lt = [3, 1, 2]
-
-        C.send_to_all("地主为玩家%d" % dizhu)
-        # to all
+        dipai=T.fanyi(dipai)
+        #给所有玩家发送地主玩家为谁
+        C.send_to_all("地主为玩家%d" % dizhu,"底牌为",dipai)
         return dizhu, lt
 
-    def fendizhu(play1, play2, play3, dipai, king_num):  # 根据结果分牌
+    def fendizhu(play1, play2, play3, dipai, king_num):  
+    # 根据结果分牌
         if king_num == 1:
             dizhu1 = dipai+play1
             caozuo1 = dizhu1
@@ -83,6 +88,13 @@ class Liucheng(object):
 
     def game_time_start(play1, play2, play3, lis_123):
         # 游戏中操作修改的对象p1,p2,p3,up,down
+        '''p1,p2,p3为玩家当前手牌；
+           up为上家出牌，down为玩家出牌。判断大小用
+           pass_num为判断pass的记录，
+           值为0时表示此时玩家可以随意出牌
+           值为1或2时表示此时玩家必须压牌或者pass
+
+           '''
         p1 = play1
         p2 = play2
         p3 = play3
@@ -96,7 +108,7 @@ class Liucheng(object):
                 if x == 1:
                     pass_num, up, down, p1 =\
                         T.gai_1_le(pass_num, up, down, p1)
-                    if len(p1) == 0:
+                    if len(p1) == 0:#手牌为0结束游戏
                         win_num = 1
                         return win_num
                 elif x == 2:
