@@ -2,10 +2,11 @@ from login_window import Screen
 from gamemain import Main
 
 def main():
-    # mainWindow = Screen()
+
+    mainWindow = Screen()
     gameWindow = Main('')
     gameWindow.main_loop()
-    # gameWindow = Main(window.user)
+
 
 
 if __name__ == '__main__':
