@@ -11,11 +11,11 @@ from user import User
 '''
 
 class Screen(QWidget):
-    def __init__(self):
+    def __init__(self,sockfd):
         self.app = QApplication(sys.argv)
         super(Screen, self).__init__()
         self.initUI()
-        self.user = User()
+        self.user = User(sockfd)
         self.app.exec_()
 
     def initUI(self):
