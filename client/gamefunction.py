@@ -4,47 +4,49 @@ import math
 class Player:
     def __init__(self,pygame,packge,screen):
         self.pygame = pygame
-        self.packge = packge
-        self.image = self.packge.otherNongmin
+        self.packge = packge #资源包
+        self.image = self.packge.otherNongmin  #设置角色图片
         self.screen = screen
         self.rect = self.image.get_rect()
-        self.cardBackGround = pygame.transform.scale(self.packge.cardBackGround, (40, 50))  #缩放提示牌大小
-        self.font = self.packge.font
+        self.cardBackGround = self.packge.cardBackGround #提示剩余牌图片
+        self.font = self.packge.font #字体
 
     def blit(self):
-        self.screen.blit(self.image,self.rect)
+        self.screen.blit(self.image,self.rect)   #绘制角色图片
 
     def showCard(self,poker):
-        '''绘制剩余牌数在角色旁边'''
+        '''绘制剩余牌数在角色旁边 poker = 角色剩余的牌 以数组的形式'''
         self.screen.blit(self.cardBackGround,(self.cardX,self.cardY))
         length = len(poker)
-        text = self.font.render('%s'%length, True, (0,0,0))
-        self.screen.blit(text,(self.cardX+50,self.cardY+20))
+        text = self.font.render('%s'%length, True, (0,0,0))  #显示剩余多少张牌
+        self.screen.blit(text,(self.cardX+50,self.cardY+20)) #绘制到屏幕上
 
     def selectDiZhu(self):
         '''选择地主'''
         self.screen.blit(self.packge.points[1].image,(self.pointX,self.pointY))
 
     def changeImage(self,image):
-        self.image = image
+        self.image = image  #改变角色图片
 
     def pushCard(self):
         pass
 
+
 class PSelf(Player):
     def __init__(self,pygame,packge,screen):
         super(PSelf,self).__init__(pygame,packge,screen)
-        self.rect.x = 50     #设置位置
+        self.rect.x = 50     #设置角色位置
         self.rect.y = 450
         self.pokers = pygame.sprite.Group()  # 要绘制的手牌  精灵组类型
         self.pointGroup = pygame.sprite.Group()
         self.buttons = pygame.sprite.Group()
-        self.cardX = 30
+        self.cardX = 30   #提示牌位置
         self.cardY = 400
-        self.pointX = 300
+        self.pointX = 300  #叫分图片位置
         self.pointY = 360
 
     def pushCard(self):
+        '''绘制出牌按钮 过按钮'''
         self.buttons.empty()
         rect = self.screen.blit(self.packge.put.image,(self.packge.put.x,self.packge.put.y))
         self.packge.put.setRect(rect)
@@ -54,7 +56,7 @@ class PSelf(Player):
         self.buttons.add(self.packge.pass1)
 
     def showCard(self,poker):
-        '''绘制手上的手牌'''
+        '''绘制手上的手牌 poker=列表 (里面放入扑克牌对象)'''
         super(PSelf, self).showCard(poker)
         width = 700
         if len(poker) * 150 > width:  # 判断牌数量是否能存放下完整大小
@@ -73,21 +75,26 @@ class PSelf(Player):
             self.pokers.add(i)  #添加到组
 
     def selectDiZhu(self):
+        '''选地主'''
         self.pointGroup.empty()
         x= self.pointX
         for point in self.packge.points:
-            rect = self.screen.blit(point.image,(x,self.pointY))
+            rect = self.screen.blit(point.image,(x,self.pointY)) #绘制叫分图片
             point.setRect(rect)
             self.pointGroup.add(point)
             x+=100
 
+
     def getPointGroup(self):
+        '''获取叫分图片组'''
         return self.pointGroup
 
     def getButtonGroup(self):
+        '''获取出牌 过 图片组'''
         return self.buttons
 
     def getPokerGroup(self):
+        '''获取扑克组'''
         return self.pokers
 
 class PLeft(Player):
@@ -120,12 +127,12 @@ class Poker(pygame.sprite.Sprite):
         self.image = pygame.image.load(path)
         self.pop = False
         # self.image =pygame.transform.scale(self.image, (40, 50))
-        # self.rect = self.image.get_rect()
 
     def setRect(self,rect):
         self.rect =rect
 
 class Mouse(pygame.sprite.Sprite):
+    '''鼠标类 在鼠标点击的一个地方动态创建一个精灵用于检测图片碰撞'''
     def __init__(self,screen):
         super(Mouse, self).__init__()
         self.screen = screen
@@ -136,12 +143,13 @@ class Mouse(pygame.sprite.Sprite):
         return pygame.mouse.get_pos()
 
     def drawPoint(self):
+        '''在指定的一个位置绘制图片'''
         mouse_x,mouse_y =self.getPos()
         self.rect = pygame.Rect(mouse_x,mouse_y,self.width,self.height)
         pygame.draw.rect(self.screen,(255,255,255),self.rect)
 
 class Point(pygame.sprite.Sprite):
-
+    '''以精灵的方式创建叫分图片'''
     def __init__(self,path,point):
         super(Point, self).__init__()
         self.path = path
@@ -152,7 +160,7 @@ class Point(pygame.sprite.Sprite):
         self.rect = rect
 
 class Buttons(pygame.sprite.Sprite):
-
+    '''以精灵的方式创建出牌 过图片'''
     def __init__(self,path,x,y,put):
         super(Buttons, self).__init__()
         self.path = path
