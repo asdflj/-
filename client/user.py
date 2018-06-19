@@ -1,5 +1,7 @@
+from protocol1 import My_ptl as Protocal
 
-class User:
+
+class User(Protocal):
     def login(self,MessageBox,username,password):
         '''登陆操作'''
         if True:

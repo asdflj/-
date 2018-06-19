@@ -5,6 +5,7 @@ import os
 ''' 简单TCP通讯协议
     author ： 854865755
     Create on Sat May 26 12:27:42 2018
+	statu  :  Finish
 '''
 
 

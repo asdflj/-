@@ -4,12 +4,18 @@ from PyQt5.QtGui import QIcon,QBrush,QPixmap,QPalette,QRegExpValidator
 from PyQt5.QtCore import Qt,QRegExp
 from user import User
 
+''' 客户端登陆窗口 使用PyQt5 作为登陆界面的绘制
+    author ： 854865755
+    Create on Sat Jun 09 12:27:42 2018
+    statu Finish
+'''
+
 class Screen(QWidget):
-    def __init__(self):
+    def __init__(self,sockfd):
         self.app = QApplication(sys.argv)
-        super().__init__()
+        super(Screen, self).__init__()
         self.initUI()
-        self.user = User()
+        self.user = User(sockfd)
         self.app.exec_()
 
     def initUI(self):
