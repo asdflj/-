@@ -2,10 +2,12 @@ from socket import *
 from protocol1 import My_ptl as Protocal
 import sys
 from threading import Thread
+from random import  randrange
 sockfd = socket(AF_INET, SOCK_STREAM, 0)
 sockfd.connect(('127.0.0.1', 8888))
 
 p=Protocal(sockfd)
+sys.argv.append(randrange(1,100))
 msg =p.baseUserPwd(sys.argv[1],'123456','login')
 
 p.sendMessage(msg)

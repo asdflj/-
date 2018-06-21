@@ -6,6 +6,7 @@ class User(Protocal):
     '''用户类'''
     def __init__(self,sockfd):
         super().__init__(sockfd)
+        self.id = 0
 
     def checkAuth(self,game_num):
         '''认证用户'''

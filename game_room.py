@@ -1,11 +1,12 @@
 from select import *
 import time
 from threading import Thread
-from test import *
+import game_main
 
 #初始化服务类
 class Game:
     def __init__(self,roomInfo,roomNumber):
+
         self.roomInfo = roomInfo
         self.roomNumber = roomNumber
         self.users =  roomInfo['Users']
@@ -79,6 +80,8 @@ class Game:
 
     def startGame(self):
             self.sendRoomMessage('开始', 'msg')
+            game_main.main(self)
+
             # while 1:
             #     pass
             # 执行游戏流程
