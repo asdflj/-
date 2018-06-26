@@ -4,7 +4,7 @@ from user import User
 from game_room import *
 import socket
 import game_room
-
+import os
 ''' 服务器主模块 用于接收客户端请求并处理 
 	author : 854865755
 	crete on Sat May 26 12:27:42 2018
@@ -112,16 +112,19 @@ class Server:
         room = game_room.Game(d_msg,num)
         while True:
             #主流程
+            time.sleep(1) #每隔1秒检测玩家数量
             if len(d_msg['Users']) == 3:
                 #发送开始游戏信息
                 room.startGame()
             elif len(d_msg['Users']) == 0:
                 return #没有玩家时结束这个进程
-            else:
-                time.sleep(1)
+
 
     #GM命令
     def gameCommand(self):
+        for i in self.game_num:
+            self.game_num[i]['Process'] == os.getpid()  #判断是否是子进程 是就结束
+            return
         while True:
             command=input('请输入要执行的命令>')
             try:
