@@ -35,7 +35,7 @@ class Main:
         while True:
             # msg = self.user.getMessage(True)
             time.sleep(1)
-            msg={'data':'选地主','title':'结束'}
+            msg={'data':'选地主','title':'结束1'}
             if msg['title'] =='选地主':
                 self.appendDisplayEvents(self.mySelf.selectDiZhu)
                 self.appendTouchEvents(self.mySelf.getPointGroup(),self.getPoint,True)
@@ -63,11 +63,9 @@ class Main:
         putCards = self.dataToPoker(putCards)
         self.leftUser.showCard(range(frontPlayer)) #显示上家手牌
         self.rightUser.showCard(range(nextPlayer)) #显示下家手牌
-        self.mySelf.showCard(myHandCards)
-        if putCards:
-            self.drawOutPokerArea(putCards)
-        else:
-            self.drawOutPokerArea(bottomCards)
+        self.mySelf.showCard(myHandCards) #显示自己的手牌
+        self.drawOutPokerArea(putCards) #显示出牌区域
+        self.drawBottomCardsArea(bottomCards) #显示底牌
 
     def dataToPoker(self,data):
         #解析
@@ -149,6 +147,7 @@ class Main:
         '''流程主循环
         '''
         while True: #主事件循环
+
             self.drawBackGroundImage() #背景覆盖
             # self.events.append(self.eventsAppend(self.mySelf.getPokerGroup(),self.fn,True)) #事件添加
             # self.drawOutPokerArea(self.packge.poker[:20])  # 绘制出牌区域
@@ -159,6 +158,7 @@ class Main:
             # self.mySelf.selectDiZhu()
             # self.rightUser.selectDiZhu()
             # self.leftUser.selectDiZhu()
+            # self.drawBottomCardsArea(self.packge.poker[1:4])
             self.gameEvent()  #处理事件
             self.mySelf.blit() #绘制自己
             self.leftUser.blit() #绘制左边玩家
@@ -179,25 +179,31 @@ class Main:
         '''绘制左边玩家'''
         return PLeft(pygame, self.packge,self.screen)
 
+    def drawBottomCardsArea(self,poker):
+        x=self.Set.bottomCardsX
+        for i in poker:
+            x+=self.Set.pokerInterval
+            self.screen.blit(i.image,(x,self.Set.bottomCardsY))
+
     def drawOutPokerArea(self,poker=None):
         '''绘制出牌区域'''
         #############计算绘制位置 ###############
         if poker:
-            width = 700
+            width = self.Set.OutPokerAreaWidth
             # height = 150
             # area = pygame.Surface((width,height))  #创建矩形
             # area.fill((0,0,255))  #填充矩形
             # area.set_colorkey((0,0,255)) #设置透明颜色
-            if len(poker)*150>width:  #判断牌数量是否能存放下完整大小
+            if len(poker)*self.Set.pokerWidth >width:  #判断牌数量是否能存放下完整大小
                 lenght = math.floor(width / (len(poker)+1))
             else:
-                lenght = 105;
+                lenght = self.Set.pokerInterval;
         #########################################
-            x = 0
+            x =self.Set.OutPokerCardsX
             #把要绘制的扑克牌绘制出来
             for i in poker:
                 x +=lenght
-                self.screen.blit(i.image,(120+x,200)) #绘制到屏幕上
+                self.screen.blit(i.image,(x,self.Set.OutPokerCardsY)) #绘制到屏幕上
 
     def loadPackge(self):
         '''加载资源包'''

@@ -19,3 +19,16 @@ class Settings:
         self.put = self.images+'put.png'
         self.putError = self.images +'notify_rule.png'
         self.putNoCards = self.images +'no_put_cards.png'
+
+        ##################扑克基础属性################
+        self.pokerInterval = 105  #扑克标准间隔
+        self.pokerWidth = 150 #扑克标准宽度
+        #############################################
+
+        self.bottomCardsX = 250 #底牌显示位置
+        self.bottomCardsY = 20 #底牌显示位置
+
+        self.OutPokerAreaWidth = 700 #出牌区域宽度
+        self.OutPokerCardsX = 120
+        self.OutPokerCardsY = 200
+
