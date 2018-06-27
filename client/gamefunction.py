@@ -31,7 +31,6 @@ class Player:
     def pushCard(self):
         pass
 
-
 class PSelf(Player):
     def __init__(self,pygame,packge,screen):
         super(PSelf,self).__init__(pygame,packge,screen)

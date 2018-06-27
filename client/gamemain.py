@@ -35,39 +35,69 @@ class Main:
         while True:
             # msg = self.user.getMessage(True)
             time.sleep(1)
-            msg={'data':'选地主','title':'选地主'}
+            msg={'data':'选地主','title':'结束'}
             if msg['title'] =='选地主':
                 self.appendDisplayEvents(self.mySelf.selectDiZhu)
                 self.appendTouchEvents(self.mySelf.getPointGroup(),self.getPoint,True)
             elif msg['title'] =='显示牌':
-                self.appendDisplayEvents(self.showPlayerCard)
-                pass
+                self.appendDisplayEvents(self.screen_update,msg['data'])
             elif msg['title'] =='出牌':
-                self.appendDisplayEvents(self.mySelf.showCard,self.packge.poker[:10])
+                myHandCard = self.dataToPoker(self.user.getPoker())
+                # myHandCard = self.dataToPoker([3,2,42])
+                self.appendDisplayEvents(self.mySelf.showCard,myHandCard)
                 self.appendDisplayEvents(self.mySelf.pushCard)
-                self.appendTouchEvents(self.mySelf.getPokerGroup(),self.popPoker,True)
+                self.appendTouchEvents(self.mySelf.getPokerGroup(),self.popPoker,False)
                 self.appendTouchEvents(self.mySelf.getButtonGroup(),self.pushCard,True)
             elif msg['title'] =='结束':
-                self.appendDisplayEvents(self.playerWin,'xx Win')
+                self.appendDisplayEvents(self.playerWin,msg['data'])
 
-    # def showPlayerCard(self,data):
-    #     #解析
+    def screen_update(self,data):
+        myHandCards = data[0]
+        bottomCards = data[1]
+        putCards = data[2]
+        frontPlayer = data[3][1]
+        nextPlayer = data[3][0]
+        self.user.setPoker(data[0]) #原始列表
+        myHandCards = self.dataToPoker(myHandCards) #转换为标准手牌
+        bottomCards = self.dataToPoker(bottomCards) #底牌转换为标准牌
+        putCards = self.dataToPoker(putCards)
+        self.leftUser.showCard(range(frontPlayer)) #显示上家手牌
+        self.rightUser.showCard(range(nextPlayer)) #显示下家手牌
+        self.mySelf.showCard(myHandCards)
+        if putCards:
+            self.drawOutPokerArea(putCards)
+        else:
+            self.drawOutPokerArea(bottomCards)
+
+    def dataToPoker(self,data):
+        #解析
+        cards = []
+        for poker in self.packge.poker:
+            if poker.ID in data:
+                cards.append(poker)
+        return cards
+
     def playerWin(self,msg):
-        font = self.packge.font  # 字体
-        text = font.render('%s'%msg, True, (0,0,0))  #显示剩余多少张牌
-        self.screen.blit(text,(400,300)) #绘制到屏幕上
+        font = self.packge.promptFont  # 字体
+        text = font.render(u'%s'%msg, True, (0,0,0))
+        self.screen.blit(text,(300,230)) #绘制到屏幕上
 
     def pushCard(self,sprite):
-        poker = []
+        poker = [] #把弹出的都添加到列表中
         for i in self.packge.poker:
             if i.pop:
+                i.pop=False #弹回去
                 poker.append(i.ID)
-        print(poker)
+
         #转换为对应的列表发送出去
+        sendIndex = list(map(lambda x:self.user.getPoker().index(x),poker))
+        print(sendIndex)
+        del self.events['touch'][0]
 
     def getPoint(self,sprite):
         point = sprite.point
         print(point)
+
         # if point == 0:
         #     msg =self.user.convert('point','Y')
         # else:
@@ -113,20 +143,10 @@ class Main:
                 for i in self.events['touch']:
                     if i():
                         del self.events['touch'][self.events['touch'].index(i)]
-
-    # 示例
-    #         if i.pop == False:
-    #             i.pop = True
-    #         else:
-    #             i.pop = False
-    #     if rect == i.rect:
-    #         print('图像',i.putCard)
-    # def fn(self,sprite):
-    #     sprite.pop = True
+                        self.events['display'] = []  # 完成之后清空显示事件
 
     def main_loop(self):
         '''流程主循环
-           请使用装饰器进行重写
         '''
         while True: #主事件循环
             self.drawBackGroundImage() #背景覆盖
@@ -187,7 +207,8 @@ class Main:
                 self.settings = settings
                 self.poker = [Poker('%s\\%s.jpg' % (self.settings.poker, i), i) for i in range(1, 55)] #加载扑克牌
                 self.backgroundImg = pygame.image.load(self.settings.backgroundImage)  # 设置背景
-                self.font = pygame.font.SysFont(self.settings.font, 16)  # 加载字体
+                self.font = pygame.font.Font(self.settings.font, 16)  # 加载字体
+                self.promptFont = pygame.font.Font(self.settings.font, 80)  # 加载字体
                 self.cardBackGround = pygame.image.load(self.settings.cardBackGround)  # 加载卡牌背景
                 self.cardBackGround = pygame.transform.scale(self.cardBackGround, (40, 50))  # 缩放提示牌大小
                 point = [self.settings.point0,self.settings.point1,self.settings.point2,self.settings.point3]

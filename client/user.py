@@ -20,3 +20,7 @@ class User(Protocal):
         else:
             MessageBox('注册', '注册失败!')
             return False
+    def setPoker(self,poker):
+        self.poker=poker
+    def getPoker(self):
+        return self.poker
