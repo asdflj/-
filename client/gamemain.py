@@ -22,7 +22,7 @@ class Main:
         self.leftUser = self.drawLeftUser() #绘制左边玩家
         self.rightUser = self.drawRightUser() #绘制右边玩家
         self.mouse = Mouse(self.screen) #鼠标点击点绘制 用来判断精灵是否碰撞
-
+        self.players = [self.mySelf,self.leftUser,self.rightUser]
         self.t =Thread(target=self.getMessage)
         self.t.setDaemon(True)
         self.t.start()
@@ -35,27 +35,34 @@ class Main:
         while True:
             msg = self.user.getMessage(True)
             time.sleep(1)
-            # msg={'data':'选地主','title':'结束1'}
+            # msg={'data':'选地主','title':'start'}
             if msg['title'] =='xszf_jdz': #选地主
+                self.events['touch'].empty()
+                self.events['display'].empty()
                 self.appendDisplayEvents(self.mySelf.selectDiZhu)
                 self.appendTouchEvents(self.mySelf.getPointGroup(),self.getPoint,True)
             elif msg['title'] =='up_screen':  #更新屏幕
-                self.appendDisplayEvents(self.screen_update,msg['data'])
+                self.appendDisplayEvents(self.screen_update,eval(msg['data']))
             elif msg['title'] =='start': #出牌
-                myHandCard = self.dataToPoker(self.user.getPoker())
-                # myHandCard = self.dataToPoker([3,2,42])
+                # myHandCard = self.dataToPoker(self.user.getPoker())
+                myHandCard = self.dataToPoker([3,2,42])
                 self.appendDisplayEvents(self.mySelf.showCard,myHandCard)
                 self.appendDisplayEvents(self.mySelf.pushCard)
                 self.appendTouchEvents(self.mySelf.getPokerGroup(),self.popPoker,False)
                 self.appendTouchEvents(self.mySelf.getButtonGroup(),self.pushCard,True)
             elif msg['title'] =='xszf_end': #结束
                 self.appendDisplayEvents(self.playerWin,msg['data'])
-            elif msg['title'] == 'xszf_num':
+            elif msg['title'] == 'xszf_num': #改变图片
+                self.changeImage(eval(msg['data']))
+            elif msg['title'] == 'xszf_pass':
                 pass
 
-
-
-    def changeImage(self):
+    def changeImage(self,data):
+        for i in data:
+            if i == 2:
+                index = data.index(i)
+                self.players[index].changeImage(self.packge.otherDizhu)
+                break
 
     def screen_update(self,data):
         myHandCards = data[0]
@@ -63,10 +70,13 @@ class Main:
         putCards = data[2]
         frontPlayer = data[3][1]
         nextPlayer = data[3][0]
+
         self.user.setPoker(data[0]) #原始列表
         myHandCards = self.dataToPoker(myHandCards) #转换为标准手牌
         bottomCards = self.dataToPoker(bottomCards) #底牌转换为标准牌
         putCards = self.dataToPoker(putCards)
+        # process = [myHandCards,frontPlayer,nextPlayer]
+        # list(map(lambda x,y:x(y),self.players,process))
         self.leftUser.showCard(range(frontPlayer)) #显示上家手牌
         self.rightUser.showCard(range(nextPlayer)) #显示下家手牌
         self.mySelf.showCard(myHandCards) #显示自己的手牌
@@ -83,11 +93,13 @@ class Main:
 
     def playerWin(self,msg):
         font = self.packge.promptFont  # 字体
-        text = font.render(u'%s'%msg, True, (0,0,0))
-        self.screen.blit(text,(300,230)) #绘制到屏幕上
+        text = font.render(u'%s' % msg, True, (0, 0, 0))
+        self.screen.blit(text, (300, 230))  # 绘制到屏幕上
+        for player in self.players:
+            player.changeImage(self.packge.otherNongmin) #全部初始化
 
     def pushCard(self,sprite):
-        while True:
+        if sprite.putCard:
             poker = [] #把弹出的都添加到列表中
             for i in self.packge.poker:
                 if i.pop:
@@ -102,18 +114,20 @@ class Main:
             self.user.sendMessage(msg)
             msg = self.uesr.getMessage(True)
             if msg['data'] =='ok':
-                break
-        del self.events['touch'][0] #删除扑克牌点击事件
+                del self.events['touch'][0] #删除扑克牌点击事件
+            else:
+                self.appendTouchEvents(self.mySelf.getButtonGroup(), self.pushCard, True) #重新出牌
+        else:
+            msg = self.user.convert('40','过')
+            self.user.sendMessage(msg)
 
     def getPoint(self,sprite):
         point = sprite.point
-        print(point)
-
-        # if point == 0:
-        #     msg =self.user.convert('point','Y')
-        # else:
-        #     msg = self.user.convert('point', 'N')
-        # self.user.sendMessage(msg)
+        if point == 0:
+            msg =self.user.convert('Y','要地主')
+        else:
+            msg = self.user.convert('N', '要地主')
+        self.user.sendMessage(msg)
 
     def popPoker(self,sprite):
         if sprite.pop ==True:
@@ -142,7 +156,6 @@ class Main:
 
     def gameEvent(self):
         '''处理事件
-           请使用装饰器进行重写
         '''
         for event in self.events['display']:
             event()
@@ -151,10 +164,13 @@ class Main:
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.mouse.drawPoint()
-                for i in self.events['touch']:
-                    if i():
-                        del self.events['touch'][self.events['touch'].index(i)]
-                        self.events['display'] = []  # 完成之后清空显示事件
+                try:
+                    for i in self.events['touch']:
+                        if i():
+                            del self.events['touch'][self.events['touch'].index(i)]
+                            self.events['display'] = []  # 完成之后清空显示事件
+                except:
+                    self.events['touch'] =[]
 
     def main_loop(self):
         '''流程主循环
@@ -181,7 +197,7 @@ class Main:
     def drawSelf(self): #初始化绘制自己
         '''绘制自己'''
         player = PSelf(pygame, self.packge, self.screen)
-        player.changeImage(self.packge.nongmin)
+        player.changeImage(self.packge.otherNongmin)
         return player
 
     def drawRightUser(self):
