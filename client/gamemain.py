@@ -33,23 +33,29 @@ class Main:
 
     def getMessage(self):
         while True:
-            # msg = self.user.getMessage(True)
+            msg = self.user.getMessage(True)
             time.sleep(1)
-            msg={'data':'选地主','title':'结束1'}
-            if msg['title'] =='选地主':
+            # msg={'data':'选地主','title':'结束1'}
+            if msg['title'] =='xszf_jdz': #选地主
                 self.appendDisplayEvents(self.mySelf.selectDiZhu)
                 self.appendTouchEvents(self.mySelf.getPointGroup(),self.getPoint,True)
-            elif msg['title'] =='显示牌':
+            elif msg['title'] =='up_screen':  #更新屏幕
                 self.appendDisplayEvents(self.screen_update,msg['data'])
-            elif msg['title'] =='出牌':
+            elif msg['title'] =='start': #出牌
                 myHandCard = self.dataToPoker(self.user.getPoker())
                 # myHandCard = self.dataToPoker([3,2,42])
                 self.appendDisplayEvents(self.mySelf.showCard,myHandCard)
                 self.appendDisplayEvents(self.mySelf.pushCard)
                 self.appendTouchEvents(self.mySelf.getPokerGroup(),self.popPoker,False)
                 self.appendTouchEvents(self.mySelf.getButtonGroup(),self.pushCard,True)
-            elif msg['title'] =='结束':
+            elif msg['title'] =='xszf_end': #结束
                 self.appendDisplayEvents(self.playerWin,msg['data'])
+            elif msg['title'] == 'xszf_num':
+                pass
+
+
+
+    def changeImage(self):
 
     def screen_update(self,data):
         myHandCards = data[0]
@@ -81,16 +87,23 @@ class Main:
         self.screen.blit(text,(300,230)) #绘制到屏幕上
 
     def pushCard(self,sprite):
-        poker = [] #把弹出的都添加到列表中
-        for i in self.packge.poker:
-            if i.pop:
-                i.pop=False #弹回去
-                poker.append(i.ID)
-
-        #转换为对应的列表发送出去
-        sendIndex = list(map(lambda x:self.user.getPoker().index(x),poker))
-        print(sendIndex)
-        del self.events['touch'][0]
+        while True:
+            poker = [] #把弹出的都添加到列表中
+            for i in self.packge.poker:
+                if i.pop:
+                    i.pop=False #弹回去
+                    poker.append(i.ID)
+            #转换为对应的列表发送出去
+            sendIndex = list(map(lambda x:self.user.getPoker().index(x),poker))
+            for i in sendIndex:
+                msg = self.user.convert(i,'发送牌')
+                self.user.sendMessage(msg)
+            msg = self.user.convert('20', '结束出牌')
+            self.user.sendMessage(msg)
+            msg = self.uesr.getMessage(True)
+            if msg['data'] =='ok':
+                break
+        del self.events['touch'][0] #删除扑克牌点击事件
 
     def getPoint(self,sprite):
         point = sprite.point
@@ -189,7 +202,7 @@ class Main:
         '''绘制出牌区域'''
         #############计算绘制位置 ###############
         if poker:
-            width = self.Set.OutPokerAreaWidth
+            width = self.Set.outPokerAreaWidth
             # height = 150
             # area = pygame.Surface((width,height))  #创建矩形
             # area.fill((0,0,255))  #填充矩形
@@ -199,11 +212,11 @@ class Main:
             else:
                 lenght = self.Set.pokerInterval;
         #########################################
-            x =self.Set.OutPokerCardsX
+            x =self.Set.outPokerCardsX
             #把要绘制的扑克牌绘制出来
             for i in poker:
                 x +=lenght
-                self.screen.blit(i.image,(x,self.Set.OutPokerCardsY)) #绘制到屏幕上
+                self.screen.blit(i.image,(x,self.Set.outPokerCardsY)) #绘制到屏幕上
 
     def loadPackge(self):
         '''加载资源包'''

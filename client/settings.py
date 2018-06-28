@@ -28,7 +28,6 @@ class Settings:
         self.bottomCardsX = 250 #底牌显示位置
         self.bottomCardsY = 20 #底牌显示位置
 
-        self.OutPokerAreaWidth = 700 #出牌区域宽度
-        self.OutPokerCardsX = 120
-        self.OutPokerCardsY = 200
-
+        self.outPokerAreaWidth = 700 #出牌区域宽度
+        self.outPokerCardsX = 120
+        self.outPokerCardsY = 200

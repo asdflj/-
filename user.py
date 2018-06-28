@@ -5,7 +5,7 @@ from protocol1 import My_ptl as Protocal
 class User(Protocal):
     '''用户类'''
     def __init__(self,sockfd):
-        super().__init__(sockfd)
+        super(User, self).__init__(sockfd)
         self.id = 0
 
     def checkAuth(self,game_num):
@@ -34,4 +34,4 @@ class User(Protocal):
     def closeSockfd(self):
         '''用户登出'''
         self.sendMessage(self.convert('ok','loginOut'))
-        super().closeSockfd()
+        super(User, self).closeSockfd()
