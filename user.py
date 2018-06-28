@@ -13,11 +13,22 @@ class User(Protocal):
             for j in game_num[i]['Users']:
                 if j.username == self.username:
                     return False
-        return True
+        if True:
+            return True
+        else:
 
-    def register(self):
+            return False
+
+    def register(self,data):
         '''注册用户'''
-        pass
+        username ,password = self.splitUserPwd(data)
+        #执行注册操作
+        if True:
+            msg = self.convert("True",'register')
+        else:
+            msg = self.convert("False", 'register')
+        self.sendMessage(msg)
+
     def setUserPwd(self,user):
         '''user格式(username,passsword)'''
         self.username,self.password=user

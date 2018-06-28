@@ -4,7 +4,10 @@ from protocol1 import My_ptl as Protocal
 class User(Protocal):
     def login(self,MessageBox,username,password):
         '''登陆操作'''
-        if self.baseUserPwd(username,password,'login'):
+        msg = self.baseUserPwd(username,password,'login')
+        self.sendMessage(msg)
+        msg = self.getMessage(True)
+        if msg['data'] == 'ok' :
             MessageBox('登陆', '登陆成功!')
             self.username = username
             self.password = password
@@ -15,7 +18,10 @@ class User(Protocal):
 
     def register(self,MessageBox,username,password):
         '''注册操作'''
-        if self.baseUserPwd(username,password,'register'):
+        msg = self.baseUserPwd(username,password,'register')
+        self.sendMessage(msg)
+        msg = self.getMessage(True)
+        if msg['data'] == 'True' :
             MessageBox('注册', '注册成功!')
             return True
         else:
