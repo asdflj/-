@@ -34,28 +34,34 @@ class Main:
     def getMessage(self):
         while True:
             msg = self.user.getMessage(True)
-            time.sleep(1)
+            print(msg)
             # msg={'data':'选地主','title':'start'}
             if msg['title'] =='xszf_jdz': #选地主
-                self.events['touch'].empty()
-                self.events['display'].empty()
+
                 self.appendDisplayEvents(self.mySelf.selectDiZhu)
                 self.appendTouchEvents(self.mySelf.getPointGroup(),self.getPoint,True)
             elif msg['title'] =='up_screen':  #更新屏幕
                 self.appendDisplayEvents(self.screen_update,eval(msg['data']))
             elif msg['title'] =='start': #出牌
-                # myHandCard = self.dataToPoker(self.user.getPoker())
-                myHandCard = self.dataToPoker([3,2,42])
+                self.events['touch']=[]
+                self.events['display']=[]
+                print(self.user.getPoker())
+                myHandCard = self.dataToPoker(self.user.getPoker())
+                # myHandCard = self.dataToPoker([3,2,42])
                 self.appendDisplayEvents(self.mySelf.showCard,myHandCard)
                 self.appendDisplayEvents(self.mySelf.pushCard)
                 self.appendTouchEvents(self.mySelf.getPokerGroup(),self.popPoker,False)
-                self.appendTouchEvents(self.mySelf.getButtonGroup(),self.pushCard,True)
+                self.appendTouchEvents(self.mySelf.getButtonGroup(),self.pushCard,False)
             elif msg['title'] =='xszf_end': #结束
                 self.appendDisplayEvents(self.playerWin,msg['data'])
             elif msg['title'] == 'xszf_num': #改变图片
-                self.changeImage(eval(msg['data']))
+                # self.changeImage(eval(msg['data']))
+                # self.changeImage([1,1,2])
+                pass
             elif msg['title'] == 'xszf_pass':
                 pass
+            # elif msg['title'] =='msg': #提示信息
+            #     self.appendDisplayEvents(self.playerWin,msg['data'])
 
     def changeImage(self,data):
         for i in data:
@@ -89,7 +95,7 @@ class Main:
         for poker in self.packge.poker:
             if poker.ID in data:
                 cards.append(poker)
-        return cards
+        return cards[::-1]
 
     def playerWin(self,msg):
         font = self.packge.promptFont  # 字体
@@ -107,10 +113,11 @@ class Main:
                     poker.append(i.ID)
             #转换为对应的列表发送出去
             sendIndex = list(map(lambda x:self.user.getPoker().index(x),poker))
+            sendIndex=sendIndex[::-1]
             for i in sendIndex:
-                msg = self.user.convert(i,'发送牌')
+                msg = self.user.convert(i,'fasongpai')#发送牌
                 self.user.sendMessage(msg)
-            msg = self.user.convert('20', '结束出牌')
+            msg = self.user.convert('20', 'jieshuchupai')#结束出牌
             self.user.sendMessage(msg)
             msg = self.uesr.getMessage(True)
             if msg['data'] =='ok':
@@ -118,15 +125,16 @@ class Main:
             else:
                 self.appendTouchEvents(self.mySelf.getButtonGroup(), self.pushCard, True) #重新出牌
         else:
-            msg = self.user.convert('40','过')
+            msg = self.user.convert('40','guo')#过
             self.user.sendMessage(msg)
 
     def getPoint(self,sprite):
         point = sprite.point
         if point == 0:
-            msg =self.user.convert('Y','要地主')
+            msg =self.user.convert('n','yaodizhu')#要地主
         else:
-            msg = self.user.convert('N', '要地主')
+            msg = self.user.convert('y', 'yaodizhu')#要地主
+        print('+++++++++++++++++++++++++,',msg)
         self.user.sendMessage(msg)
 
     def popPoker(self,sprite):
@@ -167,9 +175,10 @@ class Main:
                 self.mouse.drawPoint()
                 try:
                     for i in self.events['touch']:
+                        time.sleep(0.1)
                         if i():
                             del self.events['touch'][self.events['touch'].index(i)]
-                            self.events['display'] = []  # 完成之后清空显示事件
+                            del self.events['display'][-1]  # 完成之后清空显示事件
                 except:
                     self.events['touch'] =[]
 

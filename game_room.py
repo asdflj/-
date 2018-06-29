@@ -81,6 +81,6 @@ class Game:
     def startGame(self):
         #try:
             # self.sendRoomMessage('开始', 'msg')
-        game_main.main(self)
+        game_main.main(self.users)
         #except Exception as e:
             #self.playerExit(e)

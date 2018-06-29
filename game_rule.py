@@ -1,6 +1,32 @@
 #出牌规则类函数
+from game_connect import Connect as C
 class Rule(object):
+    def up_date(paly1,play2,play3,users,dipai=[],out_poke=[]):
         
+        shoupai = [paly1,play2,play3]
+
+        shoupai_num = [len(shoupai[0]),len(shoupai[1]),len(shoupai[2])]
+
+        update_list = [shoupai,dipai,out_poke,shoupai_num]
+
+        title = 'up_screen'
+        for y in range(3):
+            sp = update_list[0][y]
+            dp = update_list[1]
+            op = update_list[2]
+            if y ==0:
+                a,b = 1,2
+            elif y==1:
+                a,b = 2,0
+            else:
+                a,b = 0,1
+                #先下家后上家
+            spn = [update_list[3][a],update_list[3][b]]
+            update_list_child = [sp,dp,op,spn]
+            #向客户端发送数据函数
+            C.send_to_all(update_list_child,title,users[y])
+            #title2 列表串 更新每个玩家屏幕
+
     def dibanchu(lis):
         #将牌转换为1-K
         lis_diban = []
@@ -68,12 +94,12 @@ class Rule(object):
             return count1, count2, count3, count4
 
         def leixing(lis):  # 牌形选择，出牌中相同牌最大数量
-            
-            # 1为单牌类型（单张或单顺）
-            # 2为对子类型（单对或连对）
-            # 3为飞机类型
-            # 4为炸弹
-            
+            '''
+            1为单牌类型（单张或单顺）
+            2为对子类型（单对或连对）
+            3为飞机类型
+            4为炸弹
+            '''
             b = 0
             if lis != []:
                 for x in lis:
