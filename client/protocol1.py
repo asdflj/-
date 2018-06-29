@@ -86,7 +86,7 @@ class My_ptl:
     @staticmethod
     def __get_recv_length(data):
         '''获取文本中的数字'''
-        length = re.search('\d+', data).group()
+        length = re.search('(\d+)', data).group()
         if length:
             return int(length)
         return 0

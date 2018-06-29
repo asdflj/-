@@ -7,7 +7,7 @@ class User(Protocal):
         msg = self.baseUserPwd(username,password,'login')
         self.sendMessage(msg)
         msg = self.getMessage(True)
-        if msg['data'] == 'ok' :
+        if msg['title'] == 'ok' :
             MessageBox('登陆', '登陆成功!')
             self.username = username
             self.password = password
@@ -33,3 +33,7 @@ class User(Protocal):
 
     def getPoker(self):
         return self.poker
+    def closeSockfd(self):
+        msg =self.convert('退出游戏','exit')
+        self.sendMessage(msg)
+        super(User, self).closeSockfd()

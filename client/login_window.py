@@ -30,6 +30,7 @@ class Screen(QWidget):
         self.setFixedWidth(800)
         self.createlayout()   #创建控件
         self.show()
+        self.closeStuta = 0
 
     def setBackground(self):
         '''设置背景图片'''
@@ -83,6 +84,7 @@ class Screen(QWidget):
             self.myMessageBox('提示','用户名或密码不能为空')
             return
         if self.user.login(self.myMessageBox,username,password):
+            self.closeStuta = 1
             self.close()
 
     def userInputCheck(self):
@@ -106,7 +108,10 @@ class Screen(QWidget):
             return
         if self.user.register(self.myMessageBox,username,password):
             self.btnLoginClick()
-
+    # def closeEvent(self,event):
+    #     print(dir(event))
+    #     self.user.closeSockfd()
+    #     # sys.exit(0)
 
 
 

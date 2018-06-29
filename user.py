@@ -6,7 +6,13 @@ class User(Protocal):
     '''用户类'''
     def __init__(self,sockfd):
         super(User, self).__init__(sockfd)
-
+    def login(self,username,password):
+        if True:
+            self.setUserPwd((username,password))
+            return True
+            
+        else:
+            return False
     def checkAuth(self,game_num):
         '''认证用户'''
         for i in game_num:

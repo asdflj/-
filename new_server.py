@@ -7,8 +7,9 @@ import game_room
 import os
 ''' 服务器主模块 用于接收客户端请求并处理 
 	author : 854865755
-	crete on Sat May 26 12:27:42 2018
+	crete on 2018-5-26 12:27:42
 	statu  : Finish
+    fix bug : 
 ''' 
 class Server:
     #创建主套接字
@@ -55,14 +56,19 @@ class Server:
     #处理客户请求
     def handler(self,connfd):
         userInfo = User(connfd)
-        data =eval(userInfo.getMessage().decode())
-        if data['title'] == 'register':
-            userInfo.register(data['data'])   #注册用户
-        elif data['title'] == 'login':
-            userInfo.setUserPwd(userInfo.splitUserPwd(data['data']))
-            self.login(userInfo)#登录游戏
-        else:
-            userInfo.closeSockfd()
+        while True:
+            data =eval(userInfo.getMessage().decode())
+            if data['title'] == 'register':
+                userInfo.register(data['data'])   #注册用户
+            elif data['title'] == 'login':
+                if userInfo.login(*userInfo.splitUserPwd(data['data'])): #认证数据库是否有此玩家
+                    self.login(userInfo)#登录游戏
+                    return
+                else:
+                    userInfo.sendMessage(userInfo.convert('login','error'))
+            elif data['title'] == 'exit':
+                userInfo.closeSockfd()
+                return 
 
     #退出游戏时清理该桌的信息
     def clearGameDesk(self):
@@ -84,7 +90,7 @@ class Server:
                     break
     #用户登陆
     def login(self,userInfo):
-        if userInfo.checkAuth(self.game_num) and self.pool != 0:  # 认证用户 #检测玩家是否满员
+        if userInfo.checkAuth(self.game_num) and self.pool != 0:  #检测玩家是否满员 是否已存在
             self.lock.acquire() #添加锁
             userInfo.sendMessage(userInfo.convert('login','ok'))
         else:

@@ -161,6 +161,7 @@ class Main:
             event()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                self.user.closeSockfd()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.mouse.drawPoint()

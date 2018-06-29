@@ -2,7 +2,7 @@
 from game_tool import Tool as T
 from game_connect import Connect as C
 import random
-from game_room import Game
+
 
 
 class Liucheng(object):
@@ -16,7 +16,7 @@ class Liucheng(object):
         play3_fh = T.paixu(play3)
         dipai_fh = T.paixu(dipai)
         #分别将数据发送给玩家
-        L.up_date(play1_fh,play2_fh,play3_fh,dipai=[],out_poke=[],users)
+        L.up_date(play1_fh,play2_fh,play3_fh,users,dipai=[],out_poke=[])
 
         return play1_fh, play2_fh, play3_fh, dipai_fh
 
@@ -81,10 +81,10 @@ class Liucheng(object):
         caozuo2 = T.paixu(caozuo2)
         caozuo3 = T.paixu(caozuo3)
 
-        L.up_date(caozuo1, caozuo2, caozuo3,dipai,out_poke=[],users)
+        L.up_date(caozuo1, caozuo2, caozuo3,users,dipai,out_poke=[])
         return caozuo1, caozuo2, caozuo3
 
-    def up_date(paly1,play2,play3,dipai=[],out_poke=[],users):
+    def up_date(paly1,play2,play3,users,dipai=[],out_poke=[]):
         shoupai = [paly1,play2,play3]
 
         shoupai_num = [len(shoupai[0]),len(shoupai[1]),len(shoupai[2])]

@@ -2,8 +2,8 @@
 import random
 from game_connect import Connect as C
 from game_rule import Rule as R
-from game_liucheng import Liucheng as L
-from game_room import Game
+
+
 
 class Tool(object):
     def fapai():
