@@ -34,8 +34,8 @@ class Server:
                              'Communication':multiprocessing.Pipe(False)} for x in range(pool)}
         self.__addr = (host, port)
         self.lock  = Lock()
-
-        self.mysql = MysqlHelper()
+        self.mysql = lambda x,y:True
+        # self.mysql = MysqlHelper()
 
     #创建新的线程来处理新连接
     def newThread(self,connfd):
@@ -61,10 +61,13 @@ class Server:
         while True:
             data =eval(userInfo.getMessage().decode())
             if data['title'] == 'register':
-                userInfo.register(data['data'],self.mysql.regert)   #注册用户
+                # userInfo.register(data['data'],self.mysql.regert)   #注册用户
+                userInfo.register(data['data'],self.mysql)   #注册用户
             elif data['title'] == 'login':
                 username,userpassowrd = userInfo.splitUserPwd(data['data'])
-                if userInfo.login(username,userpassowrd,self.mysql.lod) and \
+                # if userInfo.login(username,userpassowrd,self.mysql.lod) and \
+                # userInfo.checkAuth(self.game_num) and self.pool != 0: #认证玩家
+                if userInfo.login(username,userpassowrd,self.mysql) and \
                 userInfo.checkAuth(self.game_num) and self.pool != 0: #认证玩家
                     userInfo.sendMessage(userInfo.convert('login','ok'))
                     self.login(userInfo)#登录游戏

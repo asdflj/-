@@ -23,8 +23,10 @@ while True:
     # msg =p.base_user_pwd(sys.argv[1],'123456','login')
     # msg = p.convert(msg,'msg')
     # print(msg)
-    msg = p.convert(msg,'msg')
-    p.sendMessage(msg)
+    msg =msg.split(' ')
+    msg = p.convert(msg[0],msg[1])
+    print(msg)
+    # p.sendMessage(msg)
     # print(sockfd.recv(1024).decode())
 
 p.closeSockfd()

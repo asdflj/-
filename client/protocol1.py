@@ -32,7 +32,7 @@ class My_ptl:
            dataType str or file
         '''
         if title and data:
-            titleLength = len(title)+9
+            titleLength = len(title.encode())+9
             ctimeLength = 38
             headSize = 13+titleLength+ctimeLength
             if data_type == 'str':

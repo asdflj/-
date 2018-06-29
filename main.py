@@ -15,8 +15,8 @@ def main():
     if os.name!='nt':
         signal.signal(signal.SIGCHLD,signal.SIG_IGN)
 
-    mysql = MysqlCreate() #初始化数据库
-    mysql.rgert()
+    # mysql = MysqlCreate() #初始化数据库
+    # mysql.rgert()
     
     GAME_POOL=30*3
     HOST,PORT=initServer()

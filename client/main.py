@@ -4,7 +4,7 @@ from socket import *
 from addr import *
 def main():
     sockfd = socket()
-    sockfd.connect(('192.168.237.130',8888))
+    sockfd.connect((addr,8888))
     mainWindow = Screen(sockfd)
     if mainWindow.closeStuta:
         gameWindow = Main(mainWindow.user)

@@ -133,6 +133,6 @@ class Liucheng(object):
     def end_result(king_num, win_num,users):
         if king_num == win_num:
 
-            C.send_to_all("地主获胜",'xszf_end',users)
+            C.send_msg_all("地主获胜",'xszf_end',users)
         else:
-            C.send_to_all("农民获胜",'xszf_end',users)
+            C.send_msg_all("农民获胜",'xszf_end',users)

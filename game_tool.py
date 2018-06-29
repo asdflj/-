@@ -85,8 +85,10 @@ class Tool(object):
                     C.send_to_one('出牌不符合规则','no',users[0])
                     continue
                 title3 = 'xszf_pass'
-                C.send_to_all("pass",title3,users)#玩家没有出牌，表示PASS
+                C.send_msg_all("pass",title3,users)#玩家没有出牌，表示PASS
                 pass_num -= 1
+                if pass_num ==0:
+                    up=[]
                 return pass_num, up, down, p1  # pass
             else:
                 if pass_num == 0:#随意出牌的情况
@@ -159,8 +161,10 @@ class Tool(object):
                     C.send_to_one('出牌不符合规则','no',users[1])
                     continue
                 title3 = 'xszf_pass'
-                C.send_to_all("pass",title3,users)#玩家没有出牌，表示PASS
+                C.send_msg_all("pass",title3,users)#玩家没有出牌，表示PASS
                 pass_num -= 1
+                if pass_num ==0:
+                    up=[]
                 return pass_num, up, down, p2  # pass
             else:
                 if pass_num == 0:#随意出牌的情况
@@ -213,7 +217,7 @@ class Tool(object):
             R.up_date(p1,p2,p3,users,dipai,up)
             title = 'start'
             s = '请玩家3出牌'
-            C.send_to_one(s,title,users[0])
+            C.send_to_one(s,title,users[2])
             sy = C.sr_p3(p3,users[2])  # 得到玩家的出牌序列
             sy_fh = sorted(sy, reverse=True)  # 排序
             lis = []
@@ -233,8 +237,10 @@ class Tool(object):
                     C.send_to_one('出牌不符合规则','no',users[2])
                     continue
                 title3 = 'xszf_pass'
-                C.send_to_all("pass",title3,users)#玩家没有出牌，表示PASS
+                C.send_msg_all("pass",title3,users)#玩家没有出牌，表示PASS
                 pass_num -= 1
+                if pass_num ==0:
+                    up=[]
                 return pass_num, up, down, p3  # pass
             else:
                 if pass_num == 0:#随意出牌的情况

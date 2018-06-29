@@ -15,7 +15,8 @@ class Main:
         self.packge = self.loadPackge()  # 加载资源包
         pygame.display.set_caption('斗地主') #设置标题
         pygame.event.set_blocked(pygame.MOUSEMOTION | pygame.MOUSEBUTTONDOWN | pygame.QUIT) #设置监听事件 测试用
-        self.events = {'touch':[],'display':{'selectDiZhu':None,'upDate':None,'prompt':None,'push':None}} #事件
+        self.events = {'touch':[],'display':{'selectDiZhu':None,'upDate':None,'prompt':None,'push':None},
+                       'now':None} #事件处理
         #初始化要绘制的信息
 
         self.mySelf = self.drawSelf()  # 绘制自己
@@ -35,6 +36,9 @@ class Main:
         while True:
             msg = self.user.getMessage(True)
             print(msg)
+            if self.events['now']:
+                self.events['now'](msg)
+                self.events['now']=None
             # msg={'data':'选地主','title':'start'}
             if msg['title'] =='xszf_jdz': #选地主
                 self.appendDisplayEvents(self.mySelf.selectDiZhu,title='selectDiZhu')
@@ -43,7 +47,6 @@ class Main:
                 self.appendDisplayEvents(self.screen_update,eval(msg['data']),'upDate')
             elif msg['title'] =='start': #出牌
                 self.events['touch']=[]
-                print(self.user.getPoker())
                 myHandCard = self.dataToPoker(self.user.getPoker())
                 self.appendDisplayEvents(self.mySelf.showCard,myHandCard,'upDate')
                 self.appendDisplayEvents(self.mySelf.pushCard,title='push')
@@ -116,12 +119,17 @@ class Main:
                 self.user.sendMessage(msg)
             msg = self.user.convert('20', 'jieshuchupai')#结束出牌
             self.user.sendMessage(msg)
-            msg = self.user.getMessage(True)
-            if msg['data'] =='ok':
-                del self.events['touch'][0] #删除扑克牌点击事件
-                self.events['display']['push']=None
-            else:
-                self.appendTouchEvents(self.mySelf.getButtonGroup(), self.pushCard, True) #重新出牌
+            def event(msg):
+                print(msg)
+                print('!!!!!!!!!!!!!!!!!!!')
+                print(msg['title']=='ok')
+                if msg['title'] =='ok':
+                    print('!!!!!!!!!!!!!!!!!!!')
+                    del self.events['touch'][0] #删除扑克牌点击事件
+                    self.events['display']['push']=None
+                else:
+                    self.appendTouchEvents(self.mySelf.getButtonGroup(), self.pushCard, True) #重新出牌
+            self.events['now']=event
         else:
             msg = self.user.convert('40','guo')#过
             self.user.sendMessage(msg)
@@ -184,7 +192,6 @@ class Main:
         '''流程主循环
         '''
         while True: #主事件循环
-
             self.drawBackGroundImage() #背景覆盖
             # self.events.append(self.eventsAppend(self.mySelf.getPokerGroup(),self.fn,True)) #事件添加
             # self.drawOutPokerArea(self.packge.poker[:20])  # 绘制出牌区域
@@ -205,7 +212,7 @@ class Main:
     def drawSelf(self): #初始化绘制自己
         '''绘制自己'''
         player = PSelf(pygame, self.packge, self.screen)
-        player.changeImage(self.packge.otherNongmin)
+        player.changeImage(self.packge.nongmin)
         return player
 
     def drawRightUser(self):
