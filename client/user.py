@@ -7,6 +7,7 @@ class User(Protocal):
         msg = self.baseUserPwd(username,password,'login')
         self.sendMessage(msg)
         msg = self.getMessage(True)
+        print(msg)
         if msg['title'] == 'ok' :
             MessageBox('登陆', '登陆成功!')
             self.username = username

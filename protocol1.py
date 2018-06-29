@@ -31,32 +31,35 @@ class My_ptl:
         '''把数据转换为标准协议
            dataType str or file
         '''
-        titleLength = len(title)+9
-        ctimeLength = 38
-        headSize = 13+titleLength+ctimeLength
-        if data_type == 'str':
-            if len(data) < 1000000000:
-                ldata = len(data.encode())+2+headSize
-                ldata = str(ldata).ljust(10, 'x')
-                result = "{'length': %(ldata)s, 'title': '%(title)s', 'time': '%(time)s', 'data': '%(data)s'}" %\
-                    {'ldata': ldata, 'title': title, 'data': data, 'time': ctime()}
+        if title and data:
+            titleLength = len(title)+9
+            ctimeLength = 38
+            headSize = 13+titleLength+ctimeLength
+            if data_type == 'str':
+                if len(data) < 1000000000:
+                    ldata = len(data.encode())+2+headSize
+                    ldata = str(ldata).ljust(10, 'x')
+                    result = "{'length': %(ldata)s, 'title': '%(title)s', 'time': '%(time)s', 'data': '%(data)s'}" %\
+                        {'ldata': ldata, 'title': title, 'data': data, 'time': ctime()}
+                else:
+                    raise '文本长度太长'
+            elif data_type == 'file':
+                fileName = data
+                if not os.path.isfile(fileName):
+                    raise '文件不存在'
+                fileSize = os.path.getsize(fileName)
+                if not fileSize:
+                    raise '文件长度为0'
+                with open(fileName, 'rb')as fp:
+                    fileData = repr(fp.read())
+                    result = "{'length': %(fileSize)s, 'title': '%(title)s', 'time': '%(time)s', 'data': %(data)s}" %\
+                        {'fileSize': str(len(fileData)+headSize).ljust(10, 'x'),
+                        'title': title, 'time': ctime(), 'data': fileData}
             else:
-                raise '文本长度太长'
-        elif data_type == 'file':
-            fileName = data
-            if not os.path.isfile(fileName):
-                raise '文件不存在'
-            fileSize = os.path.getsize(fileName)
-            if not fileSize:
-                raise '文件长度为0'
-            with open(fileName, 'rb')as fp:
-                fileData = repr(fp.read())
-                result = "{'length': %(fileSize)s, 'title': '%(title)s', 'time': '%(time)s', 'data': %(data)s}" %\
-                    {'fileSize': str(len(fileData)+headSize).ljust(10, 'x'),
-                     'title': title, 'time': ctime(), 'data': fileData}
+                raise '类型错误'
+            return PData(result, self.BUFFERSIZE)
         else:
-            raise '类型错误'
-        return PData(result, self.BUFFERSIZE)
+            raise '标题或内容不能为空'
 
     def splitUserPwd(self, data):
         '''提供基础的分割字符中的用户名和密码返回为元组

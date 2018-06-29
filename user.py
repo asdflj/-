@@ -6,8 +6,8 @@ class User(Protocal):
     '''用户类'''
     def __init__(self,sockfd):
         super(User, self).__init__(sockfd)
-    def login(self,username,password):
-        if True:
+    def login(self,username,password,fn):
+        if fn(username,password):
             self.setUserPwd((username,password))
             return True
             
@@ -25,11 +25,11 @@ class User(Protocal):
 
             return False
 
-    def register(self,data):
+    def register(self,data,fn):
         '''注册用户'''
         username ,password = self.splitUserPwd(data)
         #执行注册操作
-        if True:
+        if fn(username,passsword):
             msg = self.convert("True",'register')
         else:
             msg = self.convert("False", 'register')

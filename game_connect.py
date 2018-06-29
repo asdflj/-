@@ -51,7 +51,7 @@ class Connect(object):
             sd = addr.getMessage(convertToDict=True)#出牌按钮 对应返回 20，直接点提交 为PASS请求
             #接收用户返回数据，并添加为列表序列
             #用户点击相应位置返回0-19数字，出牌按钮对应20数字
-            sd=sd['data']
+            sd=int(sd['data'])
             if sd > (len(lis)-1) and sd != 20:
                 #点击没有牌的位置无效
                 continue
@@ -73,7 +73,7 @@ class Connect(object):
             sd = addr.getMessage(convertToDict=True)#出牌按钮 对应返回 20，直接点提交 为PASS请求
             #接收用户返回数据，并添加为列表序列
             #用户点击相应位置返回0-19数字，出牌按钮对应20数字
-            sd=sd['data']
+            sd=int(sd['data'])
             if sd > (len(lis)-1) and sd != 20:
                 #点击没有牌的位置无效
                 continue
@@ -95,7 +95,7 @@ class Connect(object):
             sd = addr.getMessage(convertToDict=True)#出牌按钮 对应返回 20，直接点提交 为PASS请求
             #接收用户返回数据，并添加为列表序列
             #用户点击相应位置返回0-19数字，出牌按钮对应20数字
-            sd=sd['data']
+            sd=int(sd['data'])
             if sd > (len(lis)-1) and sd != 20:
                 #点击没有牌的位置无效
                 continue

@@ -5,6 +5,7 @@ from game_room import *
 import socket
 import game_room
 import os
+from userLoginRegister import MysqlHelper
 ''' 服务器主模块 用于接收客户端请求并处理 
 	author : 854865755
 	crete on 2018-5-26 12:27:42
@@ -34,6 +35,7 @@ class Server:
         self.__addr = (host, port)
         self.lock  = Lock()
 
+        self.mysql = MysqlHelper()
 
     #创建新的线程来处理新连接
     def newThread(self,connfd):
@@ -59,9 +61,12 @@ class Server:
         while True:
             data =eval(userInfo.getMessage().decode())
             if data['title'] == 'register':
-                userInfo.register(data['data'])   #注册用户
+                userInfo.register(data['data'],self.mysql.regert)   #注册用户
             elif data['title'] == 'login':
-                if userInfo.login(*userInfo.splitUserPwd(data['data'])): #认证数据库是否有此玩家
+                username,userpassowrd = userInfo.splitUserPwd(data['data'])
+                if userInfo.login(username,userpassowrd,self.mysql.lod) and \
+                userInfo.checkAuth(self.game_num) and self.pool != 0: #认证玩家
+                    userInfo.sendMessage(userInfo.convert('login','ok'))
                     self.login(userInfo)#登录游戏
                     return
                 else:
@@ -90,12 +95,7 @@ class Server:
                     break
     #用户登陆
     def login(self,userInfo):
-        if userInfo.checkAuth(self.game_num) and self.pool != 0:  #检测玩家是否满员 是否已存在
-            self.lock.acquire() #添加锁
-            userInfo.sendMessage(userInfo.convert('login','ok'))
-        else:
-            userInfo.sendMessage(userInfo.convert('login','error'))
-            return
+        self.lock.acquire() #添加锁
         for i in self.game_num: #安排座位
             if len(self.game_num[i]['Users']) < 3:
                 self.pool-=1

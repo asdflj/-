@@ -15,7 +15,7 @@ class Main:
         self.packge = self.loadPackge()  # 加载资源包
         pygame.display.set_caption('斗地主') #设置标题
         pygame.event.set_blocked(pygame.MOUSEMOTION | pygame.MOUSEBUTTONDOWN | pygame.QUIT) #设置监听事件 测试用
-        self.events = {'touch':[],'display':[]} #要监听的事件
+        self.events = {'touch':[],'display':{'selectDiZhu':None,'upDate':None,'prompt':None,'push':None}} #事件
         #初始化要绘制的信息
 
         self.mySelf = self.drawSelf()  # 绘制自己
@@ -37,23 +37,20 @@ class Main:
             print(msg)
             # msg={'data':'选地主','title':'start'}
             if msg['title'] =='xszf_jdz': #选地主
-
-                self.appendDisplayEvents(self.mySelf.selectDiZhu)
+                self.appendDisplayEvents(self.mySelf.selectDiZhu,title='selectDiZhu')
                 self.appendTouchEvents(self.mySelf.getPointGroup(),self.getPoint,True)
             elif msg['title'] =='up_screen':  #更新屏幕
-                self.appendDisplayEvents(self.screen_update,eval(msg['data']))
+                self.appendDisplayEvents(self.screen_update,eval(msg['data']),'upDate')
             elif msg['title'] =='start': #出牌
                 self.events['touch']=[]
-                self.events['display']=[]
                 print(self.user.getPoker())
                 myHandCard = self.dataToPoker(self.user.getPoker())
-                # myHandCard = self.dataToPoker([3,2,42])
-                self.appendDisplayEvents(self.mySelf.showCard,myHandCard)
-                self.appendDisplayEvents(self.mySelf.pushCard)
+                self.appendDisplayEvents(self.mySelf.showCard,myHandCard,'upDate')
+                self.appendDisplayEvents(self.mySelf.pushCard,title='push')
                 self.appendTouchEvents(self.mySelf.getPokerGroup(),self.popPoker,False)
-                self.appendTouchEvents(self.mySelf.getButtonGroup(),self.pushCard,False)
+                self.appendTouchEvents(self.mySelf.getButtonGroup(),self.pushCard,True)
             elif msg['title'] =='xszf_end': #结束
-                self.appendDisplayEvents(self.playerWin,msg['data'])
+                self.appendDisplayEvents(self.playerWin,msg['data'],title='prompt')
             elif msg['title'] == 'xszf_num': #改变图片
                 # self.changeImage(eval(msg['data']))
                 # self.changeImage([1,1,2])
@@ -87,7 +84,7 @@ class Main:
         self.rightUser.showCard(range(nextPlayer)) #显示下家手牌
         self.mySelf.showCard(myHandCards) #显示自己的手牌
         self.drawOutPokerArea(putCards) #显示出牌区域
-        self.drawBottomCardsArea(bottomCards) #显示底牌
+        self.appendDisplayEvents(self.drawBottomCardsArea,bottomCards,'prompt')#显示底牌
 
     def dataToPoker(self,data):
         #解析
@@ -115,13 +112,14 @@ class Main:
             sendIndex = list(map(lambda x:self.user.getPoker().index(x),poker))
             sendIndex=sendIndex[::-1]
             for i in sendIndex:
-                msg = self.user.convert(i,'fasongpai')#发送牌
+                msg = self.user.convert(repr(i),'fasongpai')#发送牌
                 self.user.sendMessage(msg)
             msg = self.user.convert('20', 'jieshuchupai')#结束出牌
             self.user.sendMessage(msg)
-            msg = self.uesr.getMessage(True)
+            msg = self.user.getMessage(True)
             if msg['data'] =='ok':
                 del self.events['touch'][0] #删除扑克牌点击事件
+                self.events['display']['push']=None
             else:
                 self.appendTouchEvents(self.mySelf.getButtonGroup(), self.pushCard, True) #重新出牌
         else:
@@ -134,7 +132,7 @@ class Main:
             msg =self.user.convert('n','yaodizhu')#要地主
         else:
             msg = self.user.convert('y', 'yaodizhu')#要地主
-        print('+++++++++++++++++++++++++,',msg)
+        self.events['display']['selectDiZhu'] = None
         self.user.sendMessage(msg)
 
     def popPoker(self,sprite):
@@ -151,36 +149,36 @@ class Main:
             for sprite in spritesGroup.sprites():
                 if rect == sprite.rect:
                     fun(sprite)
-            return delete
+                    return delete
         self.events['touch'].append(append)
 
-    def appendDisplayEvents(self,fn,data=None):
+    def appendDisplayEvents(self,fn,data=None,title=None):
         def append():
             if data == None:
                 fn()
             else:
                 fn(data)
-        self.events['display'].append(append)
+        self.events['display'][title]=append
 
     def gameEvent(self):
         '''处理事件
         '''
         for event in self.events['display']:
-            event()
+            if self.events['display'][event] !=None:
+                self.events['display'][event]()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.user.closeSockfd()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.mouse.drawPoint()
-                try:
-                    for i in self.events['touch']:
-                        time.sleep(0.1)
-                        if i():
-                            del self.events['touch'][self.events['touch'].index(i)]
-                            del self.events['display'][-1]  # 完成之后清空显示事件
-                except:
-                    self.events['touch'] =[]
+                # try:
+                for i in self.events['touch']:
+                    time.sleep(0.1)
+                    if i():
+                        del self.events['touch'][self.events['touch'].index(i)]
+                # except:
+                #     self.events['touch'] =[]
 
     def main_loop(self):
         '''流程主循环
