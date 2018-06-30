@@ -89,7 +89,7 @@ class Liucheng(object):
         caozuo2 = T.paixu(caozuo2)
         caozuo3 = T.paixu(caozuo3)
 
-        T.up_date(caozuo1, caozuo2, caozuo3,users,dipai,out_poke=[])
+        
         return caozuo1, caozuo2, caozuo3
 
     def game_time_start(play1, play2, play3, lis_123,dipai,users):

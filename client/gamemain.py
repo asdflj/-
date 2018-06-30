@@ -113,17 +113,20 @@ class Main:
             for i in self.packge.poker:
                 if i.pop:
                     i.pop=False #弹回去
+                    print(i.ID,'牌大小')
                     poker.append(i.ID)
             #转换为对应的列表发送出去
             sendIndex = list(map(lambda x:self.user.getPoker().index(x),poker))
             sendIndex=sendIndex[::-1]
             for i in sendIndex:
                 msg = self.user.convert(repr(i),'fasongpai')#发送牌
+                print(msg)
+                time.sleep(0.1)
                 self.user.sendMessage(msg)
             msg = self.user.convert('20', 'jieshuchupai')#结束出牌
             self.user.sendMessage(msg)
             def event(msg):
-                if msg['title'] =='ok' or msg['title'] =='pass':
+                if msg['title'] =='ok' :
                     del self.events['touch'][0] #删除扑克牌点击事件
                     self.events['display']['push']=None
                 else:
@@ -132,6 +135,8 @@ class Main:
         else:
             msg = self.user.convert('40','guo')#过
             self.user.sendMessage(msg)
+            self.events['display']['push'] = None
+            del self.events['touch'][0]  # 删除扑克牌点击事件
 
     def getPoint(self,sprite):
         point = sprite.point

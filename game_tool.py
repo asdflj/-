@@ -3,7 +3,7 @@ import random
 from game_connect import Connect as C
 from game_rule import Rule as R
 
-
+import time
 class Tool(object):
     def up_date(paly1,play2,play3,users,dipai=[],out_poke=[]):
         shoupai = [paly1,play2,play3]
@@ -64,6 +64,7 @@ class Tool(object):
             R.up_date(p1,p2,p3,users,dipai,out_up)  # 看手牌
             title = 'start'
             s = 'Turn to 1'
+            time.sleep(0.3)
             C.send_to_one(s,title,users[0])
             sy = C.sr_p1(p1,users[0])  # 得到玩家的出牌序列
             sy_fh = sorted(sy, reverse=True)  # 排序
@@ -152,6 +153,7 @@ class Tool(object):
             R.up_date(p1,p2,p3,users,dipai,out_up)  # 看手牌
             title = 'start'
             s = 'Turn to 2'
+            time.sleep(0.3)
             C.send_to_one(s,title,users[1])
             sy = C.sr_p2(p2,users[1])  # 得到玩家的出牌序列
             sy_fh = sorted(sy, reverse=True)  # 排序
@@ -159,7 +161,7 @@ class Tool(object):
             lis_copy = []
             out_copy_up = []
             for x in sy:
-                s = p1[x]
+                s = p2[x]
                 lis.append(s)
                 out_copy_up.append(s)
                 lis_copy.append(s)  # 备份
@@ -238,6 +240,7 @@ class Tool(object):
             R.up_date(p1,p2,p3,users,dipai,out_up)  # 看手牌
             title = 'start'
             s = 'Turn to 3'
+            time.sleep(0.3)
             C.send_to_one(s,title,users[2])
             sy = C.sr_p3(p3,users[2])  # 得到玩家的出牌序列
             sy_fh = sorted(sy, reverse=True)  # 排序
@@ -245,7 +248,7 @@ class Tool(object):
             lis_copy = []
             out_copy_up = []
             for x in sy:
-                s = p1[x]
+                s = p3[x]
                 lis.append(s)
                 out_copy_up.append(s)
                 lis_copy.append(s)  # 备份
