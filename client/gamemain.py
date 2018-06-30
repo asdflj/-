@@ -39,8 +39,10 @@ class Main:
             if self.events['now']:
                 self.events['now'](msg)
                 self.events['now']=None
+                continue
             # msg={'data':'选地主','title':'start'}
             if msg['title'] =='xszf_jdz': #选地主
+                self.events['display']['prompt'] = None
                 self.appendDisplayEvents(self.mySelf.selectDiZhu,title='selectDiZhu')
                 self.appendTouchEvents(self.mySelf.getPointGroup(),self.getPoint,True)
             elif msg['title'] =='up_screen':  #更新屏幕
@@ -104,6 +106,7 @@ class Main:
         for player in self.players:
             player.changeImage(self.packge.otherNongmin) #全部初始化
 
+
     def pushCard(self,sprite):
         if sprite.putCard:
             poker = [] #把弹出的都添加到列表中
@@ -120,16 +123,12 @@ class Main:
             msg = self.user.convert('20', 'jieshuchupai')#结束出牌
             self.user.sendMessage(msg)
             def event(msg):
-                print(msg)
-                print('!!!!!!!!!!!!!!!!!!!')
-                print(msg['title']=='ok')
-                if msg['title'] =='ok':
-                    print('!!!!!!!!!!!!!!!!!!!')
+                if msg['title'] =='ok' or msg['title'] =='pass':
                     del self.events['touch'][0] #删除扑克牌点击事件
                     self.events['display']['push']=None
                 else:
                     self.appendTouchEvents(self.mySelf.getButtonGroup(), self.pushCard, True) #重新出牌
-            self.events['now']=event
+            self.events['now']=event # 推入立即要处理的事件
         else:
             msg = self.user.convert('40','guo')#过
             self.user.sendMessage(msg)
